@@ -181,6 +181,33 @@ document.addEventListener('DOMContentLoaded', function(){
       carouselContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
   }
+
+  // Make portfolio cards keyboard-focusable and accessible
+  const portfolioCards = Array.from(document.querySelectorAll('.portfolio-item'));
+  if(portfolioCards.length){
+    portfolioCards.forEach((card, idx) => {
+      // ensure focusable
+      if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex','0');
+      if(!card.hasAttribute('role')) card.setAttribute('role','article');
+
+      // provide an accessible label from the heading when possible
+      const title = card.querySelector('h3')?.textContent?.trim();
+      if(title && !card.hasAttribute('aria-label')){
+        card.setAttribute('aria-label', `Project: ${title}`);
+      }
+
+      // Activate primary link/button on Enter or Space
+      card.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+          const primary = card.querySelector('a.btn, button.btn');
+          if(primary){
+            e.preventDefault();
+            primary.click();
+          }
+        }
+      });
+    });
+  }
 });
 
 // Small helper if needed elsewhere

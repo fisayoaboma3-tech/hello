@@ -10,6 +10,10 @@
   --card-shadow-hover:0 18px 48px rgba(0,0,0,0.55);
   --brand:#0b6efd;
   --accent:#0b6efd;
+  /* Card-specific subtle color accents for headings/body */
+  --card-heading:#fff6d6; /* pale warm */
+  --card-heading-accent:#fbbf24; /* soft gold */
+  --card-body:var(--text-secondary);
   --radius:12px;
   --max-width:1100px;
   --container-pad:1.25rem;
@@ -29,6 +33,8 @@ body{
   will-change:scroll-position;
 }
 
+/* Prevent mobile browsers (especially iOS Safari) from auto-zooming/adjusting text-size when inputs are focused */
+html{ -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-size-adjust:100%; }
 .container{max-width:var(--max-width);margin:0 auto;padding:0 var(--container-pad)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -620,6 +626,52 @@ body{padding-top:70px}
 /* Sections */
 .section{padding:2.25rem 0}
 .section.alt{background:rgba(11,110,253,0.08)}
+
+/* Mobile: make portfolio carousel show one centered item per swipe between 200px and 900px */
+@media (min-width:200px) and (max-width:900px){
+  /* enable snap scrolling on the carousel container */
+  .portfolio-carousel{
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* smoother momentum scrolling on iOS */
+    padding-left:18px; /* small horizontal padding so centered cards have breathing room */
+    padding-right:18px;
+  }
+
+  /* make the grid a simple horizontal row that can be scrolled; center items visually */
+  .portfolio-grid{
+    display:flex;
+    flex-direction:row;
+    gap:1rem;
+    padding:0;
+    width:max-content;
+    align-items:flex-start;
+    /* don't force min-width here so items size relative to viewport */
+  }
+
+  /* Each item becomes a viewport-sized card and will snap to center */
+  .portfolio-item{
+    /* use viewport-relative sizing so item always fits the screen */
+    flex:0 0 58vw; /* card width ~78% of viewport, leaves larger gutters */
+    width:auto;
+    max-width:720px; /* prevent absurdly wide cards on larger phones */
+    margin:0; /* centering handled by scroll-snap-align */
+    scroll-snap-align:center;
+    scroll-snap-stop:always;
+  }
+
+  /* Slightly reduce image height for mobile so cards fit nicely */
+  .portfolio-image{
+    height:160px;
+  }
+
+  /* Adjust typography and spacing inside the card for narrow viewports */
+  .portfolio-item h3{font-size:1.02rem;margin:0.75rem 0.9rem 0.35rem}
+  .portfolio-desc{font-size:0.86rem;margin:0 0.9rem 0.75rem}
+  .portfolio-item .btn{margin:0.6rem 0.9rem 1rem}
+
+  /* ensure carousel nav buttons remain usable but unobtrusive */
+  .carousel-nav{width:40px;height:40px}
+}
 .section-title{margin:0 0 .25rem;font-size:1.25rem}
 .section-sub{color:var(--muted);margin:0 0 1rem}
 
@@ -643,19 +695,92 @@ body{padding-top:70px}
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
 .feature{background:var(--bg);padding:1rem;border-radius:10px;box-shadow:0 6px 16px var(--card-shadow);border:1px solid var(--border)}
 
-/* Services Grid */
-.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
-.service-card{background:linear-gradient(135deg,rgba(11,110,253,0.12),rgba(6,182,212,0.06));border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:1.75rem;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);cursor:pointer;position:relative;overflow:hidden}
-.service-card::before{content:'';position:absolute;top:-40%;right:-40%;width:200px;height:200px;background:radial-gradient(circle,rgba(11,110,253,0.1),transparent);border-radius:50%;opacity:0;transition:opacity 0.3s ease}
-.service-card:hover{transform:translateY(-8px);border-color:rgba(6,182,212,0.4);box-shadow:0 16px 48px rgba(11,110,253,0.15),inset 0 1px 0 rgba(255,255,255,0.05)}
-.service-card:hover::before{opacity:1}
-.service-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem}
-.service-icon{font-size:2.2rem;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(11,110,253,0.1))}
-.service-card h3{margin:0;font-size:1.3rem;background:linear-gradient(135deg,#fbbf24,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800;letter-spacing:-0.01em}
-.service-card p{color:var(--text-secondary);font-size:1rem;line-height:1.6;margin:1rem 0;font-weight:500}
-.service-tags{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:1rem}
-.tag{display:inline-block;background:linear-gradient(135deg,rgba(11,110,253,0.2),rgba(6,182,212,0.1));color:#7dd3fc;padding:0.45rem 0.9rem;border-radius:8px;font-size:0.85rem;font-weight:600;border:1px solid rgba(6,182,212,0.3);transition:all 0.2s ease}
-.tag:hover{background:linear-gradient(135deg,rgba(11,110,253,0.3),rgba(6,182,212,0.2));border-color:rgba(6,182,212,0.5);transform:translateY(-2px)}
+/* Services Grid - polished, glass-like cards that integrate with the page */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:1.25rem;
+  margin-top:2rem;
+}
+
+.service-card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(11,110,253,0.02));
+  border:1px solid rgba(255,255,255,0.04);
+  backdrop-filter:blur(6px) saturate(110%);
+  -webkit-backdrop-filter:blur(6px) saturate(110%);
+  border-radius:14px;
+  padding:1.5rem;
+  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  cursor:default;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 8px 28px rgba(2,6,23,0.36);
+}
+
+.service-card::before{
+  content:'';
+  position:absolute;
+  top:-30%;
+  right:-30%;
+  width:220px;
+  height:220px;
+  background:radial-gradient(circle, rgba(11,110,253,0.08), transparent 50%);
+  border-radius:50%;
+  opacity:0;
+  transition:opacity 0.28s ease;
+}
+
+.service-card:hover,
+.service-card:focus-within{
+  transform:translateY(-8px);
+  border-color:rgba(11,110,253,0.12);
+  box-shadow:0 18px 46px rgba(2,6,23,0.5);
+}
+
+.service-card:hover::before{
+  opacity:1;
+}
+
+.service-header{display:flex;align-items:center;gap:0.9rem;margin-bottom:1rem}
+
+.service-icon{
+  font-size:1.8rem;
+  flex-shrink:0;
+  width:48px;
+  height:48px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:linear-gradient(135deg, rgba(11,110,253,0.12), rgba(6,182,212,0.06));
+  color:var(--text);
+  box-shadow:0 6px 18px rgba(11,110,253,0.06);
+}
+
+.service-card h3{margin:0;font-size:1.12rem;color:var(--card-heading);font-weight:800;letter-spacing:-0.01em}
+
+.service-card h3::after{
+  content:'';
+  display:block;
+  height:4px;
+  width:48px;
+  margin-top:8px;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--card-heading-accent), rgba(255,255,255,0.06));
+  opacity:0.95;
+}
+
+.service-card p{color:var(--card-body);font-size:0.95rem;line-height:1.6;margin:0.85rem 0 1rem;font-weight:500}
+
+.service-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.9rem}
+
+.tag{display:inline-block;background:linear-gradient(135deg,rgba(11,110,253,0.06),rgba(6,182,212,0.04));color:#cfeefd;padding:0.36rem 0.7rem;border-radius:10px;font-size:0.78rem;font-weight:700;border:1px solid rgba(255,255,255,0.03);transition:transform 0.16s ease, box-shadow 0.16s ease}
+
+.tag:hover,
+.tag:focus{
+  transform:translateY(-3px);
+  box-shadow:0 10px 24px rgba(11,110,253,0.06);
+}
 
 /* Mobile responsive for services section */
 @media (max-width:768px){
@@ -698,14 +823,39 @@ body{padding-top:70px}
 .portfolio-carousel::-webkit-scrollbar{display:none}
 .portfolio-grid{display:flex;flex-direction:row;gap:1.5rem;padding:1rem 15px;min-width:100%;width:max-content}
 .portfolio-item{background:var(--bg);border:1px solid var(--border-light);border-radius:14px;overflow:hidden;transition:all 0.3s ease;will-change:transform,box-shadow;display:flex;flex-direction:column;flex-shrink:0;width:320px;height:fit-content}
-.portfolio-item:hover{transform:translateY(-10px);box-shadow:0 20px 50px rgba(0,0,0,0.5);border-color:rgba(11,110,253,0.3)}
+.portfolio-item{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(11,110,253,0.02));
+  border:1px solid rgba(255,255,255,0.04);
+  border-radius:14px;
+  overflow:hidden;
+  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  will-change:transform,box-shadow;
+  display:flex;
+  flex-direction:column;
+  flex-shrink:0;
+  width:320px;
+  height:fit-content;
+  box-shadow:0 10px 30px rgba(2,6,23,0.36);
+}
+
+.portfolio-item:hover,
+.portfolio-item:focus{
+  transform:translateY(-10px);
+  box-shadow:0 24px 60px rgba(2,6,23,0.5);
+  border-color:rgba(11,110,253,0.12);
+}
+
 .portfolio-image{height:200px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;overflow:hidden}
-.portfolio-image::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;transition:opacity 0.3s ease}
-.portfolio-item:hover .portfolio-image::before{opacity:0.1;background:rgba(255,255,255,0.1)}
-.portfolio-icon{display:inline-block;transition:transform 0.3s ease}
-.portfolio-item:hover .portfolio-icon{transform:scale(1.1)}
-.portfolio-item h3{font-size:1.15rem;margin:1rem 1.1rem 0.5rem;font-weight:700;color:#f0f4f8}
-.portfolio-desc{font-size:0.9rem;color:var(--text-secondary);margin:0 1.1rem;line-height:1.5;flex-grow:1}
+.portfolio-image::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;transition:opacity 0.28s ease}
+.portfolio-item:hover .portfolio-image::before{opacity:0.08;background:rgba(255,255,255,0.04)}
+.portfolio-icon{display:inline-block;transition:transform 0.25s ease}
+.portfolio-item:hover .portfolio-icon{transform:scale(1.08)}
+
+.portfolio-item h3{font-size:1.12rem;margin:1rem 1.1rem 0.5rem;font-weight:800;color:var(--card-heading)}
+.portfolio-item h3::after{content:'';display:block;height:3px;width:44px;margin-top:8px;border-radius:3px;background:linear-gradient(90deg,var(--card-heading-accent), rgba(255,255,255,0.06));opacity:0.95}
+.portfolio-desc{font-size:0.92rem;color:var(--card-body);margin:0 1.1rem;line-height:1.5;flex-grow:1}
+
+.portfolio-item .btn{margin:0.85rem 1.1rem 1rem;align-self:start}
 .portfolio-item .btn{margin:0.85rem 1.1rem 1rem;display:inline-block;font-size:0.87rem}
 .portfolio-item.featured{border:2px solid rgba(251,191,36,0.3);background:linear-gradient(135deg, rgba(251,191,36,0.05), rgba(11,110,253,0.02))}
 .portfolio-item.featured:hover{box-shadow:0 24px 60px rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.5)}
@@ -780,6 +930,46 @@ body{padding-top:70px}
   backdrop-filter:blur(10px);
   position:relative;
   overflow:hidden;
+}
+
+/* Tweak contact form labels and controls to match card accents */
+.contact-form-section .label-text{
+  color:var(--card-heading);
+  font-weight:800;
+  letter-spacing:0.6px;
+}
+
+.contact-form-section .form-group{margin-bottom:1.05rem}
+
+/* Accessible focus-visible styles for form controls */
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible,
+.contact-form select:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 4px rgba(11,110,253,0.12), 0 12px 30px rgba(2,6,23,0.18);
+  border-color:rgba(11,110,253,0.16);
+}
+
+/* Make contact cards keyboard-friendly (requires adding tabindex to HTML) */
+.contact-card:focus{
+  transform:translateY(-12px);
+  box-shadow:0 28px 80px rgba(6,182,212,0.26);
+  border-color:rgba(11,110,253,0.7);
+  outline:none;
+}
+
+.contact-card[tabindex]{
+  cursor:pointer;
+}
+
+/* Slight separation for contact section header inside the form column */
+.contact-left-section .section-title{
+  color:var(--card-heading);
+  margin-bottom:0.5rem;
+}
+
+.contact-left-section .section-sub{
+  color:var(--card-body);
 }
 
 .contact-form-section::before{
@@ -887,14 +1077,25 @@ body{padding-top:70px}
   font-size:1.15rem;
   font-weight:800;
   margin:0.75rem 0;
-  color:#22d3ee;
+  color:var(--card-heading);
   letter-spacing:-0.01em;
   line-height:1.3;
 }
 
+.contact-card h3::after{
+  content:'';
+  display:block;
+  height:3px;
+  width:40px;
+  margin:8px auto 0;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--card-heading-accent), rgba(255,255,255,0.06));
+  opacity:0.9;
+}
+
 .contact-card p{
   font-size:0.9rem;
-  color:var(--text-secondary);
+  color:var(--card-body);
   margin:0.75rem 0;
   line-height:1.6;
   font-weight:500;
@@ -948,32 +1149,37 @@ body{padding-top:70px}
 }
 
 .contact-platforms-card{
-  /* black professional background */
-  background:#000;
-  border:1px solid rgba(255,255,255,0.06);
-  box-shadow:0 14px 40px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-  padding:1.5rem 1.25rem !important;
+  /* integrated, glass-like card that blends with page background */
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(11,110,253,0.02));
+  border:1px solid rgba(255,255,255,0.04);
+  backdrop-filter:blur(8px) saturate(120%);
+  -webkit-backdrop-filter:blur(8px) saturate(120%);
+  box-shadow:0 10px 30px rgba(2,6,23,0.45);
+  padding:1.25rem 1rem !important;
   display:flex;
   flex-direction:column;
-  align-items:center;
+  gap:0.6rem;
+  align-items:stretch;
   justify-content:center;
-  border-radius:4px;
-  border-radius: 8px;
-  color:var(--text);
+  border-radius:14px;
+  color:var(--text-secondary);
+  width:100%;
+  max-width:100%;
 }
 
-/* keep background solid on hover for platforms card (avoid gradient/colour change) */
+/* subtle hover — keep it integrated but with lift */
 .contact-platforms-card:hover{
-  background:#041e25 !important;
-  border-radius: 10px;
+  transform:translateY(-6px);
+  box-shadow:0 18px 50px rgba(2,6,23,0.55);
+  border-color:rgba(11,110,253,0.12);
 }
 
 .contact-platforms-card h3{
-  color:#f8fafc;
-  font-size:1.25rem;
-  margin:0 0 0.9rem;
+  color:var(--text);
+  font-size:1.15rem;
+  margin:0 0 0.5rem;
   font-weight:800;
-  letter-spacing:0.6px;
+  letter-spacing:0.2px;
   text-transform:none;
   text-align:center;
 }
@@ -982,52 +1188,69 @@ body{padding-top:70px}
   font-size:0.78rem;
   color:var(--muted);
   text-transform:uppercase;
-  letter-spacing:0.8px;
+  letter-spacing:0.6px;
   font-weight:700;
   display:block;
-  margin-bottom:0.85rem;
+  margin-bottom:0.5rem;
+  text-align:center;
 }
 
-/* make buttons more prominent and tap-friendly */
+/* arrange buttons in a responsive grid so they look tidy */
 .contact-platforms-card .platform-buttons{
-  display:flex;
-  flex-wrap:wrap;
-  gap:0.65rem;
-  justify-content:center;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+  gap:0.6rem;
+  align-items:center;
+  justify-items:center;
   width:100%;
 }
 
+/* stronger, consistent platform button styles inside this card */
 .contact-platforms-card .platform-btn{
   display:inline-flex;
   align-items:center;
   justify-content:center;
   gap:0.6rem;
-  padding:0.85rem 1rem;
-  min-width:140px;
-  flex:1 1 45%;
-  max-width:260px;
-  border-radius:12px;
+  padding:0.65rem 0.9rem;
+  min-width:120px;
+  height:52px;
+  flex:0 1 auto;
+  border-radius:10px;
   font-weight:800;
   font-size:0.95rem;
-  box-shadow:0 8px 20px rgba(0,0,0,0.35);
+  box-shadow:0 8px 20px rgba(0,0,0,0.22);
+  transition:transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.contact-platforms-card .platform-btn:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 14px 34px rgba(0,0,0,0.28);
+}
+
+.contact-platforms-card .platform-btn:focus{
+  outline:none;
+  box-shadow:0 0 0 4px rgba(11,110,253,0.12), 0 12px 30px rgba(0,0,0,0.24);
 }
 
 .contact-platforms-card .platform-logo{
-  height:28px;
+  height:26px;
   width:auto;
-  max-height:28px;
+  max-height:26px;
+  display:block;
 }
 
-/* verified-badge style */
+/* verified-badge style — slightly more subtle */
 .contact-platforms-card .contact-sub{
   display:inline-block;
-  margin-top:1rem;
-  padding:0.5rem 0.9rem;
+  margin-top:0.6rem;
+  padding:0.45rem 0.75rem;
   background:rgba(255,255,255,0.02);
-  color:#dbeafe;
+  color:var(--text-secondary);
   border-radius:10px;
   font-weight:700;
-  letter-spacing:0.6px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  font-size:0.78rem;
 }
 .form-group{
   margin-bottom:1.35rem;
@@ -1059,7 +1282,10 @@ body{padding-top:70px}
   color:var(--text);
   transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
   font-family:inherit;
-  font-size:0.95rem;
+  /* Keep font-size at 16px minimum to avoid mobile browsers auto-zooming on focus */
+  font-size:1rem;
+  -webkit-text-size-adjust:100%;
+  -ms-text-size-adjust:100%;
   backdrop-filter:blur(5px);
 }
 
@@ -1441,7 +1667,8 @@ body{padding-top:70px}
   .contact-form textarea,
   .contact-form select{
     padding:0.75rem;
-    font-size:0.9rem;
+    /* keep controls at 16px on mobile to prevent auto-zoom */
+    font-size:1rem;
   }
   
   .form-actions{
@@ -1567,7 +1794,8 @@ body{padding-top:70px}
   .contact-form textarea,
   .contact-form select{
     padding:0.65rem;
-    font-size:0.85rem;
+    /* keep controls at 16px on small phones to avoid iOS Safari auto-zoom */
+    font-size:1rem;
   }
   
   .contact-cards-container{
