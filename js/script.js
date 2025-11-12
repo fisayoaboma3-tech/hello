@@ -145,27 +145,7 @@ document.addEventListener('DOMContentLoaded', function(){
     el.classList.add('reveal'); observer.observe(el);
   });
 
-  // Form handling (no network call) — simple validation and success message
-  const form = document.getElementById('contact-form');
-  const status = document.getElementById('form-status');
-  if(form){
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      const fm = new FormData(form);
-      const name = fm.get('name')?.toString().trim();
-      const email = fm.get('email')?.toString().trim();
-      const message = fm.get('message')?.toString().trim();
-      if(!name || !email || !message){
-        status.textContent = 'Please complete all fields.';
-        status.style.color = 'crimson';
-        return;
-      }
-      // Simulate success
-      status.textContent = 'Thanks — we received your message. We will reply within one business day.';
-      status.style.color = ''; // use stylesheet color
-      form.reset();
-    });
-  }
+
 
   // Demo button quick-scroll to form and focus
   const demoBtn = document.getElementById('demo-button');
@@ -179,6 +159,197 @@ document.addEventListener('DOMContentLoaded', function(){
       },450);
     });
   }
+
+  // Contact form submission with email redirection
+  function setupContactForm(){
+    const form = document.getElementById('contact-form');
+    const formStatus = document.getElementById('form-status');
+
+    if(!form) {
+      console.warn('Contact form not found');
+      return;
+    }
+
+    function showFormStatus(message, type){
+      if(formStatus){
+        formStatus.textContent = message;
+        formStatus.className = `form-status ${type}`;
+        formStatus.style.display = 'block';
+        
+        // Auto-clear success messages after 4 seconds
+        if(type === 'success'){
+          setTimeout(() => {
+            formStatus.style.display = 'none';
+          }, 4000);
+        }
+      }
+    }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      console.log('Form submitted');
+
+  // Get form values
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const serviceSelect = document.getElementById('service');
+  const service = serviceSelect ? serviceSelect.value.trim() : '';
+  const serviceLabel = (serviceSelect && serviceSelect.options[serviceSelect.selectedIndex]) ? serviceSelect.options[serviceSelect.selectedIndex].text.trim() : '';
+  const message = document.getElementById('message').value.trim();
+
+      console.log('Form values:', { name, service, message });
+
+      // Validate required fields
+      if(!name){
+        showFormStatus('Please enter your full name.', 'error');
+        return;
+      }
+      if(!service){
+        showFormStatus('Please select a service.', 'error');
+        return;
+      }
+      if(!message){
+        showFormStatus('Please enter your message.', 'error');
+        return;
+      }
+
+  // Build email subject + body (use human-readable service label instead of the option value)
+  const subjectServicePart = service ? ` - ${serviceLabel}` : '';
+  const emailSubject = `New Message from ${name}`;
+
+  // Only include the service line in the body when a real service is selected
+  const serviceLine = service ? `Service Interest: ${serviceLabel}\n` : '';
+  const emailBody = `Hello Mr. Enoch,\n\nMy name is ${name}. I'm contacting you regarding a potential project opportunity and would like to discuss how your expertise can support our goals.\n\nAwaiting your response:\n\n${message}\n\n${serviceLine}Phone: ${phone || 'Not provided'}\n\nI look forward to your response and guidance on the next steps.\n\nBest regards,\n${name}`;
+
+        // Create mailto link
+        const toAddress = 'chukwudi.enoch.work@gmail.com';
+        const mailtoLink = `mailto:${toAddress}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+        console.log('Mailto link:', mailtoLink);
+
+        // Also build common webmail compose URLs (Gmail, Outlook, Yahoo)
+        const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(toAddress)}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        const outlookLink = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${encodeURIComponent(toAddress)}&subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        const yahooLink = `https://compose.mail.yahoo.com/?to=${encodeURIComponent(toAddress)}&subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+        // Helper to open safely (must be in user gesture to avoid popup blocking)
+        function openUrl(url){
+          try{
+            const win = window.open(url, '_blank');
+            // window.open may return null if blocked
+            return !!win;
+          }catch(err){
+            return false;
+          }
+        }
+
+  // Show a friendly status message
+  showFormStatus('Opening your email... Few seconds...', 'success');
+
+        // Detect mobile (prefer native mail apps)
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        if(isMobile){
+          // Mobile: use mailto to open native mail app
+          console.log('Mobile detected — using mailto');
+          // Clear the form before redirecting
+          clearForm();
+          window.location.href = mailtoLink;
+          return;
+        }
+
+        // Desktop: try to open Gmail compose in a new tab/window (most users use Gmail).
+        // If that fails (popup blocked), fall back to Outlook/Yahoo and finally to mailto in-place.
+        console.log('Desktop detected — attempting webmail compose');
+
+        // Try opening Gmail in a new tab (most reliable UX). window.open is allowed from user gesture.
+        let win = null;
+        try{
+          win = window.open(gmailLink, '_blank');
+        }catch(err){
+          console.warn('window.open threw', err);
+          win = null;
+        }
+
+        if(win){
+          console.log('Opened Gmail compose in new tab/window');
+          // Clear the form now that the flow has started
+          clearForm();
+          // provide a fallback link in case the user isn't signed into Gmail in that tab
+          setTimeout(() => {
+            showFormStatus('If your email didn\'t open, click the link below to compose manually.', 'success');
+            addFallbackLink(mailtoLink);
+          }, 1200);
+          return;
+        }
+
+        // If window.open was blocked, try opening Outlook compose in same tab (navigation)
+        try{
+          // Clear the form before navigating
+          clearForm();
+          window.location.href = outlookLink;
+          return;
+        }catch(err){
+          console.warn('Navigation to Outlook failed', err);
+        }
+
+        // Try Yahoo compose
+        try{
+          clearForm();
+          window.location.href = yahooLink;
+          return;
+        }catch(err){
+          console.warn('Navigation to Yahoo failed', err);
+        }
+
+        // Final fallback: navigate to mailto (this should open the default mail app or handler)
+        console.log('All webmail attempts failed or blocked — falling back to mailto navigation');
+        try{
+          clearForm();
+          window.location.href = mailtoLink;
+        }catch(err){
+          console.warn('mailTo navigation failed', err);
+          // As last resort show a visible fallback link for the user to click
+          showFormStatus('Could not open your email automatically — click the link below to compose.', 'error');
+          addFallbackLink(mailtoLink);
+        }
+      });
+
+      // Adds a small visible fallback link under the form status
+      function addFallbackLink(href){
+        const existing = document.getElementById('fallback-email-link');
+        if(existing) return;
+        const p = document.createElement('p');
+        p.className = 'form-status';
+        p.style.marginTop = '0.6rem';
+        p.innerHTML = `If nothing opened, <a id="fallback-email-link" href="${href}">click here to compose an email</a>.`;
+        const container = document.getElementById('form-status')?.parentElement || document.querySelector('.form-actions');
+        container && container.appendChild(p);
+      }
+
+      function removeFallbackLink(){
+        const link = document.getElementById('fallback-email-link');
+        if(link){
+          const p = link.closest('p');
+          p && p.remove();
+        }
+      }
+
+      function clearForm(){
+        try{
+          // reset inputs
+          form.reset();
+          // hide status
+          if(formStatus){ formStatus.style.display = 'none'; }
+          // remove any fallback
+          removeFallbackLink();
+        }catch(err){
+          console.warn('Failed to clear form', err);
+        }
+      }
+  }
+
+  setupContactForm();
 
   // Portfolio carousel navigation
   const carouselPrev = document.querySelector('.carousel-prev');
