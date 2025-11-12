@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ENOCHDESK: Web Development, SEO Optimization, and AI-Powered Virtual Assistant. Helping entrepreneurs scale their business with efficiency and intelligence.">
+  <title>ENOCHDESK — Web Developer, SEO Specialist & Virtual Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1349 1349'%3E%3Crect fill='%23000' width='1349' height='1349'/%3E%3Cpath fill='%23fff' d='M280 290Q280 180 370 110Q460 40 560 40Q660 40 750 110Q840 180 840 290L840 860Q840 970 750 1040Q660 1110 560 1110Q460 1110 370 1040Q280 970 280 860V290Z'/%3E%3Cpath fill='%23000' d='M560 400L750 400L750 500L560 500V400M560 600L750 600L750 700L560 700V600'/%3E%3Cpath fill='%23fff' d='M1040 290Q1040 180 950 110Q860 40 760 40Q660 40 750 110Q840 180 840 290L840 860Q840 970 950 1040Q1040 1110 1140 1110Q1240 1110 1150 1040Q1060 970 1060 860V290Z'/%3E%3Cpath fill='%23000' d='M850 400L1040 400L1040 500L850 500V400M850 600L1040 600L1040 700L850 700V600'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="VA home">
+        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo">
+        <span class="brand-name"><span class="brand-enoch">ENOCH</span><span class="brand-desk">DESK</span></span>
+      </a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <!-- Three separate paths so we can animate to an X -->
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 6h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4 12h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav id="primary-nav" class="nav">
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a class="btn btn-primary" href="#contact">Get started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1>Hi, I'm Enoch <span class="wave-emoji">👋🏾</span></h1>
+          <p class="hero-subtitle">Web Developer | SEO Specialist | AI-Powered Virtual Assistant <span class="fast-response">⚡ Fast Response</span></p>
+          <p class="lead">I help entrepreneurs and small businesses grow online. I build stunning, SEO-optimized websites and provide comprehensive virtual assistance powered by AI. From email management to scheduling, data analysis, and workflow automation — I handle it all. <span class="highlight-text">⚡ Available for quick project discussions</span> More visibility. Better systems. Real growth.</p>
+          <p class="cta-row">
+            <a class="btn btn-primary" href="#contact">Hire Me</a>
+            <a class="btn btn-ghost" href="#services">See My Services</a>
+          </p>
+        </div>
+
+        <!-- Profile image area: replace the SVG file with your attached image (e.g. images/your-photo.jpg) -->
+        <aside class="hero-profile" aria-label="Profile">
+          <img src="images/ceo.jpg" alt="Profile portrait" class="profile-img">
+          <p class="profile-caption">Enoch Chukwudi — Founder</p>
+        </aside>
+
+        <div class="hero-card" id="about" aria-hidden="true">
+          <div class="card-mock">
+            <div class="mock-header">
+              <div class="header-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+              </div>
+              <div class="header-content">
+                <span class="header-title section-title">About Me</span>
+                <span class="header-subtitle polymer section-sub">Enoch Chukwudi — Web Developer / SEO Specialist / AI-Powered VA</span>
+              </div>
+            </div>
+            <div class="mock-body">
+              <div class="expertise-section">
+                <span class="section-label">Who I Am</span>
+                
+                <div class="expertise-item">
+                  <div class="expertise-icon">�</div>
+                  <div class="expertise-content">
+                    <span class="expertise-title">Tech-Savvy VA with Developer Mindset</span>
+                    <span class="expertise-desc">Helping busy entrepreneurs run smoother, faster, and smarter with automation and creative systems</span>
+                  </div>
+                </div>
+                
+                <div class="expertise-item">
+                  <div class="expertise-icon">�</div>
+                  <div class="expertise-content">
+                    <span class="expertise-title">SEO Optimization</span>
+                    <span class="expertise-desc">Technical & on-page SEO for better rankings</span>
+                  </div>
+                </div>
+                
+                <div class="expertise-item">
+                  <div class="expertise-icon">🤖</div>
+                  <div class="expertise-content">
+                    <span class="expertise-title">AI-Powered VA</span>
+                    <span class="expertise-desc">Email, scheduling, data analysis, automation</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="body-divider"></div>
+              
+              <div class="mission-section">
+                <span class="section-label">Beyond Work</span>
+                <span class="mission-text">Based in Nigeria, serving clients worldwide 🌍. I'm committed to delivering exceptional results, optimizing your systems, and helping your business thrive with reliable, professional service.</span>
+              </div>
+            </div>
+            <div class="mock-footer">
+              <div class="footer-badge"></div>
+              <div class="footer-badge small"></div>
+            </div>
+          </div>
+          <div class="card-accent"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="container">
+        <h2 class="section-title">Services</h2>
+        <p class="section-sub">Professional expertise across web development, SEO, and virtual assistance.</p>
+
+        <div class="services-grid">
+
+             <div class="service-card">
+            <div class="service-header">
+              <span class="service-icon">⚙️</span>
+              <h3>Virtual Assistance (AI-Powered)</h3>
+            </div>
+            <p>Full-spectrum a General virtual assistant services enhanced with AI. Email management, scheduling, data analysis, customer support, research, and administrative tasks streamlined and automated.</p>
+            <div class="service-tags">
+              <span class="tag">Email Management</span>
+              <span class="tag">Scheduling</span>
+              <span class="tag">Data Analysis</span>
+              <span class="tag">AI Automation</span>
+              <span class="tag">Calendar & Planning</span>
+              <span class="tag">Data Entry</span>
+              <span class="tag">Content & Management</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-header">
+              <span class="service-icon">💻</span>
+              <h3>Web Development</h3>
+            </div>
+            <p>Custom websites and web applications built with modern technologies. Responsive design, fast performance, and user-focused interfaces.</p>
+            <div class="service-tags">
+              <span class="tag">HTML/CSS</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">React</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-header">
+              <span class="service-icon">🔍</span>
+              <h3>SEO Optimization</h3>
+            </div>
+            <p>Boost your online visibility with proven SEO strategies. Technical optimization, content strategy, and keyword research for better rankings.</p>
+            <div class="service-tags">
+              <span class="tag">On-page SEO</span>
+              <span class="tag">Technical SEO</span>
+              <span class="tag">Analytics</span>
+            </div>
+          </div>
+
+       
+        </div>
+      </div>
+    </section>
+
+    <section id="portfolio" class="section alt">
+      <div class="container">
+        <h2 class="section-title">Portfolio</h2>
+        <p class="section-sub">Showcase of recent projects and results delivered for clients.</p>
+
+        <div class="portfolio-carousel-wrapper">
+          <button class="carousel-nav carousel-prev" aria-label="Previous project">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <div class="portfolio-carousel">
+            <div class="portfolio-grid">
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #0b6efd, #0ea5e9);">
+                  <span class="portfolio-icon">💻</span>
+                </div>
+                <h3>E-Commerce Platform</h3>
+                <p class="portfolio-desc">Built a fully responsive e-commerce website with product catalog, shopping cart, and payment integration. Increased conversion rate by 35%.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item featured">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #fbbf24, #fcd34d);">
+                  <span class="portfolio-icon">🔍</span>
+                </div>
+                <h3>SEO Transformation</h3>
+                <p class="portfolio-desc">Executed comprehensive SEO strategy resulting in 240% organic traffic increase within 6 months. Ranked top 3 for 15+ high-value keywords.</p>
+                <a class="btn btn-primary" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #10b981, #34d399);">
+                  <span class="portfolio-icon">⚙️</span>
+                </div>
+                <h3>Business Automation</h3>
+                <p class="portfolio-desc">Streamlined client operations with AI-powered automation. Reduced manual work by 80% and saved 20+ hours weekly across multiple processes.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                  <span class="portfolio-icon">📋</span>
+                </div>
+                <h3>Notion Workspace Setup</h3>
+                <p class="portfolio-desc">Designed and configured comprehensive Notion workspaces with databases, automations, and templates. Improved team productivity by 60%.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #ec4899, #f472b6);">
+                  <span class="portfolio-icon">☁️</span>
+                </div>
+                <h3>Google Workspace Integration</h3>
+                <p class="portfolio-desc">Implemented Google Workspace solutions with Gmail automation, Sheets optimization, and team collaboration workflows. Streamlined communication channels.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                  <span class="portfolio-icon">📊</span>
+                </div>
+                <h3>Data Management & Analytics</h3>
+                <p class="portfolio-desc">Set up data pipelines, created custom dashboards, and established reporting systems. Enabled data-driven decision making for clients.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">
+                  <span class="portfolio-icon">✉️</span>
+                </div>
+                <h3>Email Marketing Campaigns</h3>
+                <p class="portfolio-desc">Designed and managed email marketing sequences with personalization. Increased open rates by 45% and click-through rates by 32% for e-commerce client.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #dc2626, #ef4444);">
+                  <span class="portfolio-icon">📱</span>
+                </div>
+                <h3>Responsive Mobile App Design</h3>
+                <p class="portfolio-desc">Built a fully responsive mobile app interface with cross-browser compatibility. Enhanced user experience with intuitive navigation and modern UI patterns.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">
+                  <span class="portfolio-icon">🎯</span>
+                </div>
+                <h3>Content Strategy & SEO</h3>
+                <p class="portfolio-desc">Developed comprehensive content strategy with keyword research and optimization. Generated 150+ blog posts that ranked on first page for competitive keywords.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #059669, #10b981);">
+                  <span class="portfolio-icon">📅</span>
+                </div>
+                <h3>Calendar & Schedule Management</h3>
+                <p class="portfolio-desc">Organized complex multi-client schedules with automated reminders and conflict resolution. Reduced scheduling errors by 95% and improved team coordination.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #e11d48, #f43f5e);">
+                  <span class="portfolio-icon">🛒</span>
+                </div>
+                <h3>Shopify Store Optimization</h3>
+                <p class="portfolio-desc">Optimized Shopify store for conversion with improved product pages, checkout flow, and mobile experience. Boosted sales by 150% in first 3 months.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #0891b2, #06b6d4);">
+                  <span class="portfolio-icon">📈</span>
+                </div>
+                <h3>PPC Campaign Management</h3>
+                <p class="portfolio-desc">Managed Google Ads and Facebook Ads campaigns with A/B testing and optimization. Reduced CPA by 40% while increasing conversion volume by 65%.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #b91c1c, #dc2626);">
+                  <span class="portfolio-icon">🌐</span>
+                </div>
+                <h3>WordPress Site Redesign</h3>
+                <p class="portfolio-desc">Completely redesigned WordPress site with custom theme, improved speed, and SEO optimization. Increased page views by 200% and user engagement by 85%.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #16a34a, #22c55e);">
+                  <span class="portfolio-icon">💬</span>
+                </div>
+                <h3>Social Media Management</h3>
+                <p class="portfolio-desc">Managed social media accounts across Instagram, LinkedIn, and Twitter. Grew follower base by 300% and increased engagement rate from 2% to 8%.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item featured">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #d946ef, #ec4899);">
+                  <span class="portfolio-icon">🚀</span>
+                </div>
+                <h3>Full-Stack Web Application</h3>
+                <p class="portfolio-desc">Built complete web application with React, Node.js, and MongoDB. Deployed to production with CI/CD pipeline and real-time user analytics tracking.</p>
+                <a class="btn btn-primary" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #ea580c, #f97316);">
+                  <span class="portfolio-icon">🎨</span>
+                </div>
+                <h3>Brand Identity Design</h3>
+                <p class="portfolio-desc">Created comprehensive brand identity including logo, color palette, and design system. Helped startup establish professional brand presence in competitive market.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+
+              <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #0369a1, #0284c7);">
+                  <span class="portfolio-icon">🔐</span>
+                </div>
+                <h3>VA Workflow Automation</h3>
+                <p class="portfolio-desc">Automated repetitive VA tasks using Zapier and Make.com. Saved 25+ hours per week and reduced human error by 90% across administrative processes.</p>
+                <a class="btn btn-ghost" href="#contact">View Project</a>
+              </div>
+            </div>
+          </div>
+
+          <button class="carousel-nav carousel-next" aria-label="Next project">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="section-sub">Ready to grow your business? Let's connect and discuss how I can help.</p>
+
+        <div class="contact-wrapper">
+          <div class="contact-left-section">
+            <div class="contact-form-section">
+              <form id="contact-form" class="contact-form" novalidate>
+                <div class="form-group">
+                  <label for="name">
+                    <span class="label-text">Full Name</span>
+                    <input id="name" name="name" type="text" required placeholder="Enoch Chukwudi">
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="email">
+                    <span class="label-text">Email Address</span>
+                    <input id="email" name="email" type="email" required placeholder="your@email.com">
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="phone">
+                    <span class="label-text">Phone (Optional)</span>
+                    <input id="phone" name="phone" type="tel" placeholder="+1 (555) 123-4567">
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="service">
+                    <span class="label-text">Service Interest</span>
+                    <select id="service" name="service" required>
+                      <option value="">Select a service</option>
+                      <option value="va">Virtual Assistance</option>
+                      <option value="web">Web Development</option>
+                      <option value="seo">SEO Optimization</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="message">
+                    <span class="label-text">Message</span>
+                    <textarea id="message" name="message" rows="6" required placeholder="Tell me about your project and goals..."></textarea>
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Send Message</button>
+                  <p id="form-status" class="form-status" aria-live="polite"></p>
+                </div>
+              </form>
+            </div>
+          </div>
+
+
+          <div class="contact-cards-container">
+            <div class="contact-card contact-platforms-card">
+              <h3>Verified Professional Profiles</h3>
+              <span class="platform-label">Connect with me on</span>
+              <div class="platform-buttons">
+                <a href="https://fiverr.com" class="platform-btn fiverr-btn" title="Fiverr - Verified Freelancer" target="_blank" rel="noopener noreferrer">
+                  <img src="images/fiverr.png" alt="Fiverr" class="platform-logo">
+                </a>
+                <a href="https://upwork.com" class="platform-btn upwork-btn" title="Upwork - Top Rated Plus" target="_blank" rel="noopener noreferrer">
+                  <img src="images/upwork.png" alt="Upwork" class="platform-logo">
+                </a>
+                <a href="https://freelancer.com" class="platform-btn freelancer-btn" title="Freelancer - Certified Member" target="_blank" rel="noopener noreferrer">
+                  <img src="images/freelancer.png" alt="Freelancer" class="platform-logo">
+                </a>
+                <a href="https://www.peopleperhour.com" class="platform-btn pph-btn" title="PeoplePerHour - Vetted Expert" target="_blank" rel="noopener noreferrer">
+                  <img src="images/peopleperhour.png" alt="PeoplePerHour" class="platform-logo">
+                </a>
+                <a href="https://www.toptal.com" class="platform-btn toptal-btn" title="Toptal - Exclusive Talent" target="_blank" rel="noopener noreferrer">
+                  <img src="images/toptal.png" alt="Toptal" class="platform-logo">
+                </a>
+              </div>
+              <span class="contact-sub">All Profiles Verified & Active</span>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-section">
+         <a class="brand" href="#home" aria-label="VA home">
+        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo">
+        <span class="brand-name"><span class="brand-enoch">ENOCH</span><span class="brand-desk">DESK</span></span>
+      </a>
+        <p class="footer-desc">Web Developer | SEO Specialist | AI-Powered Virtual Assistant</p>
+        <p class="footer-tagline">Helping entrepreneurs and small businesses grow online with stunning websites and comprehensive virtual assistance.</p>
+      </div>
+
+      <div class="footer-section">
+        <h4 class="footer-heading">Quick Links</h4>
+        <nav class="footer-nav" aria-label="footer navigation">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#services">Services</a>
+          <a href="#portfolio">Portfolio</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+
+      <div class="footer-section">
+        <h4 class="footer-heading">Services</h4>
+        <nav class="footer-nav" aria-label="services">
+          <a href="#services">Web Development</a>
+          <a href="#services">SEO Optimization</a>
+          <a href="#services">Virtual Assistance</a>
+          <a href="#services">AI Automation</a>
+        </nav>
+      </div>
+
+      <div class="footer-section">
+        <h4 class="footer-heading">Connect</h4>
+        <div class="footer-socials">
+          <a href="mailto:enochdesk@gmail.com" title="Email" aria-label="Email">📧</a>
+          <a href="https://wa.me/2349162919586" title="WhatsApp" aria-label="WhatsApp" class="whatsapp-social">
+            <img src="images/whatsapp.png" alt="WhatsApp" class="footer-social-logo">
+          </a>
+          <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn" class="linkedin-social">
+            <img src="images/linkedin2.png" alt="LinkedIn" class="footer-social-logo">
+          </a>
+         
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; <span id="year"></span> ENOCHDESK — Simple & Trustworthy. All rights reserved.</p>
+      <p class="footer-credit">Crafted with <span class="heart">❤️</span> for your success</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js" defer></script>
+</body>
+</html>
