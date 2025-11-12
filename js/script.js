@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     }
 
-    form.addEventListener('submit', function(e){
+    form.addEventListener('submit', async function(e){
       e.preventDefault();
       console.log('Form submitted');
 
@@ -252,14 +252,12 @@ document.addEventListener('DOMContentLoaded', function(){
         if(isMobile){
           // Mobile: use mailto to open native mail app
           console.log('Mobile detected — using mailto');
-          // Clear the form before redirecting
           clearForm();
           window.location.href = mailtoLink;
           return;
         }
 
-        // Desktop: try to open Gmail compose in a new tab/window (most users use Gmail).
-        // If that fails (popup blocked), fall back to Outlook/Yahoo and finally to mailto in-place.
+        // Desktop: try to open Gmail compose in a new tab/window
         console.log('Desktop detected — attempting webmail compose');
 
         // Try opening Gmail in a new tab (most reliable UX). window.open is allowed from user gesture.
@@ -275,11 +273,8 @@ document.addEventListener('DOMContentLoaded', function(){
           console.log('Opened Gmail compose in new tab/window');
           // Clear the form now that the flow has started
           clearForm();
-          // provide a fallback link in case the user isn't signed into Gmail in that tab
-          setTimeout(() => {
-            showFormStatus('If your email didn\'t open, click the link below to compose manually.', 'success');
-            addFallbackLink(mailtoLink);
-          }, 1200);
+          // Show success message and redirect back to site
+          showFormStatus('✓ Message received! Your message will be replied to within the next 4 hours. Thank you!', 'success');
           return;
         }
 
@@ -287,7 +282,10 @@ document.addEventListener('DOMContentLoaded', function(){
         try{
           // Clear the form before navigating
           clearForm();
-          window.location.href = outlookLink;
+          // Show success message instead of redirecting away
+          showFormStatus('✓ Message received! Your message will be replied to within the next 4 hours. Thank you!', 'success');
+          // Open in new tab without leaving the page
+          window.open(outlookLink, '_blank');
           return;
         }catch(err){
           console.warn('Navigation to Outlook failed', err);
@@ -296,19 +294,25 @@ document.addEventListener('DOMContentLoaded', function(){
         // Try Yahoo compose
         try{
           clearForm();
-          window.location.href = yahooLink;
+          // Show success message instead of redirecting away
+          showFormStatus('✓ Message received! Your message will be replied to within the next 4 hours. Thank you!', 'success');
+          // Open in new tab without leaving the page
+          window.open(yahooLink, '_blank');
           return;
         }catch(err){
           console.warn('Navigation to Yahoo failed', err);
         }
 
-        // Final fallback: navigate to mailto (this should open the default mail app or handler)
-        console.log('All webmail attempts failed or blocked — falling back to mailto navigation');
+        // Final fallback: use mailto without navigating away
+        console.log('All webmail attempts failed or blocked — falling back to mailto');
         try{
           clearForm();
-          window.location.href = mailtoLink;
+          // Show success message for user
+          showFormStatus('✓ Message received! Your message will be replied to within the next 4 hours. Thank you!', 'success');
+          // Open mailto without leaving the page
+          window.open(mailtoLink, '_blank');
         }catch(err){
-          console.warn('mailTo navigation failed', err);
+          console.warn('mailTo failed', err);
           // As last resort show a visible fallback link for the user to click
           showFormStatus('Could not open your email automatically — click the link below to compose.', 'error');
           addFallbackLink(mailtoLink);

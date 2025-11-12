@@ -1371,6 +1371,35 @@ body{padding-top:70px}
   border-left-color:#ef4444;
 }
 
+/* Professional corporate form notice */
+.form-notice{
+  margin-top:1.5rem;
+  padding:1rem 1.2rem;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.08);
+  border-left:3px solid rgba(11,110,253,0.2);
+  border-radius:10px;
+}
+
+.notice-text{
+  margin:0;
+  color:var(--text-secondary);
+  font-size:0.93rem;
+  font-weight:500;
+  line-height:1.55;
+  letter-spacing:0.2px;
+}
+
+.notice-text strong{
+  color:var(--text);
+  font-weight:700;
+}
+
+.notice-highlight{
+  color:#fff5d6 !important;
+  font-weight:800;
+}
+
 .contact-info-section{
   display:flex;
   flex-direction:column;
