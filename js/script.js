@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Only include the service line in the body when a real service is selected
   const serviceLine = service ? `Service Interest: ${serviceLabel}\n` : '';
-  const emailBody = `Hello Mr. Enoch,\n\nMy name is ${name}. I'm contacting you regarding a potential project opportunity and would like to discuss how your expertise can support our goals.\n\nAwaiting your response:\n\n${message}\n\n${serviceLine}Phone: ${phone || 'Not provided'}\n\nI look forward to your response and guidance on the next steps.\n\nBest regards,\n${name}`;
+  const emailBody = `Hello Mr. Enoch,\n\nMy name is ${name}. I'm contacting you regarding a potential project opportunity and would like to discuss how your expertise can support our goals.\n\nMessage:\n\n${message}\n\n${serviceLine}Phone: ${phone || 'Not provided'}\n\nI look forward to your response and guidance on the next steps.\n\nBest regards,\n${name}`;
 
         // Create mailto link
         const toAddress = 'chukwudi.enoch.work@gmail.com';
