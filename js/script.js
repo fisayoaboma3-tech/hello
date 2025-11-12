@@ -8,6 +8,21 @@ document.addEventListener('DOMContentLoaded', function(){
   const html = document.documentElement;
   html.setAttribute('data-theme', 'dark');
 
+  // Disable double-tap zoom for app-like feel on mobile
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function(event) {
+    const now = Date.now();
+    if(now - lastTouchEnd <= 300){
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+
+  // Also disable zoom on touch events
+  document.addEventListener('gesturestart', function(e) {
+    e.preventDefault();
+  }, false);
+
   // Hero section animations and interactions
   const heroCopy = document.querySelector('.hero-copy');
   const ctaButtons = document.querySelectorAll('.cta-row .btn');
