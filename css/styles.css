@@ -33,8 +33,6 @@ body{
   will-change:scroll-position;
 }
 
-/* Prevent mobile browsers (especially iOS Safari) from auto-zooming/adjusting text-size when inputs are focused */
-html{ -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-size-adjust:100%; }
 .container{max-width:var(--max-width);margin:0 auto;padding:0 var(--container-pad)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -633,8 +631,11 @@ body{padding-top:70px}
   .portfolio-carousel{
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch; /* smoother momentum scrolling on iOS */
-    padding-left:18px; /* small horizontal padding so centered cards have breathing room */
-    padding-right:18px;
+    /* remove fixed container padding and use scroll-padding so the centered card sits perfectly
+       in the middle of the viewport. Calculation centers a 58vw card: (100vw - 58vw) / 2 = 21vw */
+    padding-left:0;
+    padding-right:0;
+    scroll-padding-inline: calc((100vw - 58vw) / 2);
   }
 
   /* make the grid a simple horizontal row that can be scrolled; center items visually */
@@ -1282,10 +1283,7 @@ body{padding-top:70px}
   color:var(--text);
   transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
   font-family:inherit;
-  /* Keep font-size at 16px minimum to avoid mobile browsers auto-zooming on focus */
-  font-size:1rem;
-  -webkit-text-size-adjust:100%;
-  -ms-text-size-adjust:100%;
+  font-size:0.95rem;
   backdrop-filter:blur(5px);
 }
 
@@ -1667,8 +1665,7 @@ body{padding-top:70px}
   .contact-form textarea,
   .contact-form select{
     padding:0.75rem;
-    /* keep controls at 16px on mobile to prevent auto-zoom */
-    font-size:1rem;
+    font-size:0.9rem;
   }
   
   .form-actions{
@@ -1794,8 +1791,7 @@ body{padding-top:70px}
   .contact-form textarea,
   .contact-form select{
     padding:0.65rem;
-    /* keep controls at 16px on small phones to avoid iOS Safari auto-zoom */
-    font-size:1rem;
+    font-size:0.85rem;
   }
   
   .contact-cards-container{
