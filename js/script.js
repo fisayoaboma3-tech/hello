@@ -171,14 +171,37 @@ document.addEventListener('DOMContentLoaded', function(){
   const carouselContainer = document.querySelector('.portfolio-carousel');
   
   if(carouselPrev && carouselNext && carouselContainer){
-    const scrollAmount = 340; // card width + gap
-    
+    const items = Array.from(carouselContainer.querySelectorAll('.portfolio-item'));
+
+    function getCenteredIndex(){
+      const center = carouselContainer.scrollLeft + (carouselContainer.clientWidth / 2);
+      let bestIndex = 0;
+      let bestDistance = Infinity;
+      items.forEach((it, idx) => {
+        const itemCenter = it.offsetLeft + (it.offsetWidth / 2);
+        const dist = Math.abs(itemCenter - center);
+        if(dist < bestDistance){ bestDistance = dist; bestIndex = idx; }
+      });
+      return bestIndex;
+    }
+
+    function scrollToIndex(idx){
+      const clampedIdx = Math.max(0, Math.min(items.length - 1, idx));
+      const item = items[clampedIdx];
+      if(!item) return;
+      // Use scrollIntoView with smooth behavior and center alignment
+      // This respects the scroll-padding-inline set in CSS
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
     carouselPrev.addEventListener('click', () => {
-      carouselContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      const cur = getCenteredIndex();
+      scrollToIndex(cur - 1);
     });
-    
+
     carouselNext.addEventListener('click', () => {
-      carouselContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const cur = getCenteredIndex();
+      scrollToIndex(cur + 1);
     });
   }
 
