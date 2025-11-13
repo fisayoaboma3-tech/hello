@@ -1,0 +1,143 @@
+/* Desktop-only contact layout tweaks: positions the contact cards to the right of the form
+   Keeps mobile layout unchanged (this file is only used for larger viewports)
+*/
+
+@media (min-width:1000px){
+  /* ensure the contact area becomes a clear two-column layout */
+  .contact-wrapper{
+    display:flex;
+    flex-direction:row;
+    gap:2rem;
+    align-items:flex-start;
+    justify-content:space-between;
+    flex-wrap:nowrap;
+  }
+
+  /* let the form column take the remaining space but cap it so the cards have room */
+  .contact-left-section{
+    flex:1 1 auto;
+    max-width: calc(100% - 360px); /* reserve ~340px for the cards + gap */
+    min-width:0; /* prevent overflowing children from forcing width */
+  }
+
+  /* make the right column a narrow vertical stack for cards/platforms */
+  .contact-cards-container{
+    flex:0 0 340px;
+    max-width:340px;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    align-items:stretch;
+    padding-left:0;
+    padding-right:0;
+    min-width:auto;
+    overflow:visible;
+  }
+
+  /* each contact card should fill the right column width */
+  .contact-cards-container .contact-card{
+    width:100%;
+    flex-shrink:0;
+  }
+
+  /* make the verified platforms card prominent and stick on scroll */
+  .contact-cards-container .contact-platforms-card{
+    position:sticky;
+    top:110px; /* beneath the fixed header */
+  }
+
+  /* ensure the contact form keeps normal flow and doesn't overflow when content is long */
+  .contact-form-section{
+    max-width:100%;
+  }
+}
+
+/* Mobile / small-tablet tweaks to ensure the contact form and cards are arranged well on narrow screens */
+@media (max-width:999px){
+  .contact-wrapper{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    align-items:stretch;
+    justify-content:flex-start;
+    padding:0;
+  }
+
+  .contact-left-section{
+    flex:1 1 auto;
+    max-width:100%;
+    padding:0;
+    margin:0;
+  }
+
+  .contact-form-section{
+    padding:1.2rem;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(2,6,23,0.18);
+    border:1px solid rgba(11,110,253,0.08);
+  }
+
+  /* Make the cards horizontally scrollable so they don't force very wide layouts */
+  .contact-cards-container{
+    flex-direction:row;
+    gap:0.75rem;
+    align-items:stretch;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:0.25rem 0;
+    width:100%;
+  }
+
+  /* Cards become small pill-like cards users can swipe through */
+  .contact-cards-container .contact-card{
+    min-width:200px;
+    width:auto;
+    flex:0 0 auto;
+    height:auto;
+    padding:1rem;
+    border-radius:12px;
+  }
+
+  /* Platform buttons wrap on mobile and logos are smaller/tappable */
+  .platform-buttons{
+    display:flex;
+    gap:0.5rem;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    margin:0.6rem 0 0.4rem;
+  }
+
+  .platform-btn{display:inline-flex;align-items:center;justify-content:center;padding:4px;border-radius:8px;background:transparent;border:0}
+
+  .platform-logo{width:56px;height:auto;display:block;object-fit:contain}
+
+  /* Keep the platforms card in normal flow on small screens (no sticky) */
+  .contact-cards-container .contact-platforms-card{
+    position:relative;
+    top:auto;
+  }
+
+  .contact-sub{display:block;margin-top:0.5rem;font-size:0.92rem}
+}
+
+/* Platform-specific brand accents: keep logos in original color and add subtle brand accents */
+.platform-logo{filter:none !important;opacity:1}
+
+.platform-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:6px;border-radius:10px;background:transparent;transition:transform 0.18s ease,box-shadow 0.18s ease}
+
+.platform-btn:hover{transform:translateY(-4px);box-shadow:0 10px 26px rgba(0,0,0,0.18)}
+
+/* Dark-theme (default) subtle 1px brand-tinted borders + left accent */
+.platform-btn.fiverr-btn{border:1px solid rgba(29,191,115,0.12);border-left:4px solid #1DBF73;background:linear-gradient(90deg, rgba(29,191,115,0.04), rgba(29,191,115,0.01))}
+.platform-btn.upwork-btn{border:1px solid rgba(111,207,60,0.12);border-left:4px solid #6FCF3C;background:linear-gradient(90deg, rgba(111,207,60,0.04), rgba(111,207,60,0.01))}
+.platform-btn.freelancer-btn{border:1px solid rgba(0,102,255,0.12);border-left:4px solid #0066FF;background:linear-gradient(90deg, rgba(0,102,255,0.04), rgba(0,102,255,0.01))}
+.platform-btn.pph-btn{border:1px solid rgba(111,45,168,0.12);border-left:4px solid #6F2DA8;background:linear-gradient(90deg, rgba(111,45,168,0.04), rgba(111,45,168,0.01))}
+.platform-btn.toptal-btn{border:1px solid rgba(0,163,224,0.12);border-left:4px solid #00A3E0;background:linear-gradient(90deg, rgba(0,163,224,0.04), rgba(0,163,224,0.01))}
+
+/* Ensure brand accents are subtle but visible in light theme */
+[data-theme="light"] .platform-btn.fiverr-btn{background:linear-gradient(90deg, rgba(29,191,115,0.08), rgba(29,191,115,0.03));border:1px solid rgba(29,191,115,0.14);border-left-color:#1DBF73}
+[data-theme="light"] .platform-btn.upwork-btn{background:linear-gradient(90deg, rgba(111,207,60,0.08), rgba(111,207,60,0.03));border:1px solid rgba(111,207,60,0.14);border-left-color:#6FCF3C}
+[data-theme="light"] .platform-btn.freelancer-btn{background:linear-gradient(90deg, rgba(0,102,255,0.08), rgba(0,102,255,0.03));border:1px solid rgba(0,102,255,0.14);border-left-color:#0066FF}
+[data-theme="light"] .platform-btn.pph-btn{background:linear-gradient(90deg, rgba(111,45,168,0.08), rgba(111,45,168,0.03));border:1px solid rgba(111,45,168,0.14);border-left-color:#6F2DA8}
+[data-theme="light"] .platform-btn.toptal-btn{background:linear-gradient(90deg, rgba(0,163,224,0.08), rgba(0,163,224,0.03));border:1px solid rgba(0,163,224,0.14);border-left-color:#00A3E0}
+

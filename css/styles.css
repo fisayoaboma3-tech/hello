@@ -8,8 +8,8 @@
   --border-light:#2a3a4a;
   --card-shadow:0 6px 20px rgba(0,0,0,0.45);
   --card-shadow-hover:0 18px 48px rgba(0,0,0,0.55);
-  --brand:#0b6efd;
-  --accent:#0b6efd;
+  --brand:#0d7377;
+  --accent:#0d7377;
   /* Card-specific subtle color accents for headings/body */
   --card-heading:#fff6d6; /* pale warm */
   --card-heading-accent:#fbbf24; /* soft gold */
@@ -29,19 +29,785 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   line-height:1.45;
-  transition:background 0.3s ease, color 0.3s ease;
+  transition:background 0.4s ease, color 0.4s ease;
   will-change:scroll-position;
 }
+
+/* Smooth theme transition for all elements */
+/* Broad transitions are expensive and cause an unwanted animation on first load.
+   Only enable wide color/box-shadow transitions when the JS adds
+   the `theme-transition` class during an explicit theme change. */
+.theme-transition,
+.theme-transition * {
+  transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out, border-color 0.6s ease-in-out, box-shadow 0.6s ease-in-out, opacity 0.6s ease-in-out;
+}
+
+/* Keep a couple of more specific transitions on elements that should always animate */
+
+/* Smooth transition overlay for light mode entry */
+.theme-transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease-in-out, background-color 0.35s ease-in-out;
+  z-index: 9999;
+}
+
+.theme-transition-overlay.active {
+  opacity: 1;
+}
+
+/* Smooth image fade transition when switching themes */
+.hero-profile img {
+  transition: opacity 0.5s ease;
+}
+
+/* background radial layers controlled via CSS variable --bg-radials (set by JS) */
+body::before{
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--bg-radials, none);
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* slightly reduced blur and higher opacity so blues read deeper */
+  filter: blur(36px) saturate(140%);
+  opacity: 0.9;
+  transition: opacity 0.6s ease, transform 1s ease, background-image 0.6s ease, filter 0.6s ease;
+  mix-blend-mode: overlay;
+}
+
+/* Performance-focused tweaks for dark mode (default) */
+:not([data-theme="light"]) {
+  /* reduce heavy background blur for cheaper paints */
+  body::before{
+    /* lower blur and saturation to reduce GPU/paint work while keeping depth */
+    filter: blur(14px) saturate(110%);
+    opacity: 0.82;
+    transition: opacity 0.45s ease, filter 0.45s ease;
+  }
+
+  /* Remove expensive backdrop-filters site-wide in dark mode to improve scroll/painiting */
+  .service-card,
+  .portfolio-item,
+  .contact-card,
+  .hero-card .card-mock,
+  .contact-form-section,
+  .profile-img {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    /* slightly reduced shadow depth to limit expensive blurs */
+    box-shadow: 0 8px 22px rgba(0,0,0,0.36) !important;
+  }
+
+  /* Prefer transform/opacity transitions for animated elements (cheap for compositor) */
+  .nav a,
+  .service-card,
+  .portfolio-item,
+  .contact-card,
+  .btn,
+  .nav-toggle,
+  .theme-toggle,
+  .hero-profile,
+  .carousel-nav {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  /* Limit hover shadow growth to reduce repaint cost */
+  .service-card:hover,
+  .portfolio-item:hover,
+  .contact-card:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.42) !important;
+    transform: translateZ(0);
+  }
+
+  /* Contain overscroll for smoother scrolling on mobile */
+  body, html { overscroll-behavior: auto; scrollbar-gutter: stable; }
+}
+
+/* Respect user reduced motion preference to avoid animation jank */
+@media (prefers-reduced-motion: reduce){
+  :root *{
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* LIGHT MODE PERFORMANCE OPTIMIZATIONS - reduce expensive shadows and filters */
+[data-theme="light"] {
+  /* Reduce heavy blur and shadows for better paint performance */
+  body::before{
+    filter: blur(8px) saturate(90%) !important;
+    opacity: 0.7 !important;
+    transition: opacity 0.35s ease, filter 0.35s ease !important;
+  }
+
+  /* Disable expensive backdrop-filters in light mode cards to improve scroll smoothness */
+  .service-card,
+  .portfolio-item,
+  .contact-card,
+  .hero-card .card-mock,
+  .contact-form-section,
+  .contact-form,
+  .plan,
+  .feature {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Reduce shadow depth in light mode for lighter paints */
+  .service-card,
+  .portfolio-item,
+  .contact-card,
+  .contact-form-section {
+    box-shadow: 0 6px 18px rgba(13, 115, 119, 0.08) !important;
+  }
+
+  /* Reduce hover shadow growth to minimize repaint cost */
+  .service-card:hover,
+  .service-card:focus-within,
+  .portfolio-item:hover,
+  .portfolio-item:focus,
+  .contact-card:hover {
+    box-shadow: 0 10px 28px rgba(13, 115, 119, 0.12) !important;
+  }
+
+  /* Add hardware acceleration hints for smooth animations */
+  .service-card,
+  .portfolio-item,
+  .contact-card,
+  .btn,
+  .nav a,
+  .carousel-nav,
+  .theme-toggle,
+  .nav-toggle {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  /* Reduce icon/logo filter operations */
+  .brand-logo,
+  .footer-social-logo,
+  .platform-logo,
+  .service-icon {
+    filter: none !important;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Reduce form input shadow complexity */
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form select {
+    box-shadow: 0 3px 10px rgba(13, 115, 119, 0.04) !important;
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus,
+  .contact-form select:focus {
+    box-shadow: 0 6px 16px rgba(13, 115, 119, 0.08) !important;
+  }
+
+  /* Reduce header/navigation paint cost */
+  .site-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* Reduce footer paint cost */
+  .site-footer,
+  .footer-section {
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Optimize transition durations for light mode */
+  .service-card,
+  .portfolio-item,
+  .contact-card,
+  .btn,
+  .nav a {
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease, color 0.35s ease !important;
+  }
+
+  /* Disable expensive glow/overlay effects in light mode */
+  .service-card::after,
+  .portfolio-item::after,
+  .contact-card::after,
+  .contact-form-section::after,
+  .card-accent {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Reduce mock-card shadow complexity */
+  .hero-card .card-mock {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Light mode button optimizations */
+  .btn {
+    box-shadow: 0 4px 12px rgba(13, 115, 119, 0.08) !important;
+  }
+
+  .btn:hover,
+  .btn:active {
+    box-shadow: 0 8px 20px rgba(13, 115, 119, 0.12) !important;
+  }
+
+  /* Lighter carousel nav shadows */
+  .carousel-nav {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .carousel-nav:hover {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+/* keep main content above the gradient overlay */
+main{position:relative;z-index:1}
+
+/* Light theme overrides and helper classes
+   - Provides a professional gradient background for light (white) mode
+   - Ensures very-light text gets a darker background for legibility via .needs-dark-bg
+*/
+[data-theme="light"]{
+  /* base color for light mode. body gets a gradient below so nested uses of --bg (colors) remain safe */
+  --bg: #F7FFF7;
+  --text: #0f172a; /* dark text for readability */
+  --text-secondary: #374151;
+  --muted: #6b7280;
+  --border: #e6edf8;
+  --border-light: #e2e8f0;
+  --card-shadow: 0 10px 30px rgba(16,24,40,0.06);
+  --card-shadow-hover: 0 20px 50px rgba(16,24,40,0.08);
+  --brand: #0d7377;
+  --accent: #0d7377;
+  --card-heading: #0f172a;
+  --card-heading-accent: #f59e0b;
+}
+
+/* Apply the light mode background color to body */
+[data-theme="light"] body{
+  background: #F7FFF7;
+  transition: background 0.6s ease;
+}
+
+/* Smooth background transition for dark mode */
+body {
+  transition: background 0.6s ease;
+}
+
+/* Surface and control adjustments for very light base so elements remain distinct and usable */
+.service-card,
+.portfolio-item,
+.contact-card,
+.contact-form,
+.contact-form-section,
+.contact-platforms-card,
+.hero-card .card-mock,
+.plan,
+.feature {
+  transition: background 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease, color 0.6s ease;
+}
+
+[data-theme="light"] .service-card,
+[data-theme="light"] .portfolio-item,
+[data-theme="light"] .contact-card,
+[data-theme="light"] .contact-form,
+[data-theme="light"] .contact-form-section,
+[data-theme="light"] .contact-platforms-card,
+[data-theme="light"] .hero-card .card-mock,
+[data-theme="light"] .plan,
+[data-theme="light"] .feature{
+  background: linear-gradient(180deg,#ffffff,#fbfffb) !important; /* subtle white surface */
+  border: 1px solid rgba(16,24,40,0.06) !important;
+  box-shadow: 0 8px 28px rgba(16,24,40,0.06) !important;
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .contact-form input,
+[data-theme="light"] .contact-form textarea,
+[data-theme="light"] .contact-form select{
+  background: #ffffff !important;
+  border: 2px solid rgba(13, 115, 119, 0.2) !important;
+  color: var(--text) !important;
+  box-shadow: 0 4px 14px rgba(13, 115, 119, 0.06) !important;
+  padding: 0.85rem 1rem !important;
+  font-size: 0.98rem !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+[data-theme="light"] .contact-form input:focus,
+[data-theme="light"] .contact-form textarea:focus,
+[data-theme="light"] .contact-form select:focus {
+  border-color: #0d7377 !important;
+  box-shadow: 0 8px 24px rgba(13, 115, 119, 0.15) !important;
+  background: #fafbff !important;
+}
+
+/* Smooth transitions for form inputs */
+.contact-form input,
+.contact-form textarea,
+.contact-form select {
+  transition: background 0.6s ease, border-color 0.6s ease, color 0.6s ease, box-shadow 0.6s ease;
+}
+
+[data-theme="light"] .platform-btn,
+[data-theme="light"] .btn{
+  box-shadow: 0 8px 22px rgba(16,24,40,0.06) !important;
+}
+
+/* Smooth transitions for buttons */
+.platform-btn,
+.btn {
+  transition: background 0.6s ease, color 0.6s ease, box-shadow 0.6s ease, border-color 0.6s ease;
+}
+
+[data-theme="light"] .btn.btn-ghost{
+  background: transparent !important;
+  border: 1px solid rgba(16,24,40,0.08) !important;
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .brand-enoch{ background:#000; color:#fff }
+[data-theme="light"] .brand-desk{ background:#fff; color:#000 }
+
+[data-theme="light"] .footer-section,
+[data-theme="light"] .site-footer{
+  background: linear-gradient(180deg,#f8faf7,#f1f7f1) !important;
+  border-top: 1px solid rgba(16,24,40,0.04) !important;
+}
+
+/* Ensure the footer sits above fixed light-mode overlays */
+[data-theme="light"] .site-footer{
+  position: relative;
+  z-index: 100; /* higher than the fixed overlay (which uses z-index:0) */
+}
+
+[data-theme="light"] .notice-text{ color:var(--text-secondary) }
+
+
+/* Stronger contrast overrides for key hero and CTA elements in light mode */
+[data-theme="light"] .hero-copy h1{
+  /* remove gradient clipped text for maximum legibility on a light background */
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #0f172a !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Light-mode hero overlay: subtle dark gradient coming from the right while keeping the main background visible */
+[data-theme="light"] .hero{
+  position: relative;
+  overflow: visible;
+}
+
+[data-theme="light"] .hero::after{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0; /* sits under the main content (which uses z-index:1) */
+  background: linear-gradient(to right, rgba(76, 69, 69, 0.444) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+
+
+/* Apply the same wide dark overlay to the Services section in light mode */
+[data-theme="light"] #services{
+  position: relative; /* required for fixed-positioned pseudo-element */
+  overflow: visible;
+}
+
+[data-theme="light"] #services::after{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0; /* keep overlay beneath section content */
+  background: linear-gradient(to right, rgba(246, 246, 246, 0) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+/* Right-side subtle overlay for Services in light mode */
+[data-theme="light"] #services::before{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(to left, rgba(76, 69, 69, 0.444) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+/* Apply the same wide dark overlay to the Portfolio section in light mode */
+[data-theme="light"] #portfolio{
+  position: relative; /* required for fixed-positioned pseudo-element */
+  overflow: visible;
+}
+
+[data-theme="light"] #portfolio::after{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0; /* keep overlay beneath section content */
+  background: linear-gradient(to right, rgba(246, 246, 246, 0) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+/* Right-side subtle overlay for Portfolio in light mode */
+[data-theme="light"] #portfolio::before{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(to left, rgba(76, 69, 69, 0.444) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+/* Improve legibility in light mode: ensure section headings and subtitles sit clearly above
+   the decorative background and overlays. Also lift the carousel container so cards/icons
+   don't blend with the page radial background. */
+[data-theme="light"] .section-title{
+  color: #071423 !important; /* near-black for good contrast */
+  background: none !important; /* remove any clipped gradient text that can become pale */
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: none !important;
+}
+
+
+
+[data-theme="light"] .section-sub{
+  color: #374151 !important; /* darker secondary for readable subhead */
+  font-weight: 600 !important;
+}
+
+/* Make portfolio container and inner content render above the background overlay */
+[data-theme="light"] #portfolio .container,
+[data-theme="light"] .portfolio-carousel-wrapper,
+[data-theme="light"] .portfolio-grid{
+  position: relative;
+  z-index: 2; /* sits above the #portfolio::after overlay */
+}
+
+/* Remove the stronger blue tint for the alt-section in light mode so text reads clearly */
+[data-theme="light"] .section.alt{
+  background: transparent !important;
+}
+
+/* Ensure the portfolio intro text uses the dark text color (side-effect safety) */
+[data-theme="light"] #portfolio .section-sub{
+  color: var(--text-secondary) !important;
+}
+
+/* Apply the same wide dark overlay to the Contact section in light mode */
+[data-theme="light"] #contact{
+  position: relative; /* required for fixed-positioned pseudo-element */
+  overflow: visible;
+}
+
+[data-theme="light"] #contact::after{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0; /* keep overlay beneath section content */
+  background: linear-gradient(to right, rgba(246, 246, 246, 0) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+/* Right-side subtle overlay for Contact in light mode */
+[data-theme="light"] #contact::before{
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(to left, rgba(76, 69, 69, 0.444) 0%, rgba(181, 163, 163, 0.073) 35%, transparent 70%);
+  mix-blend-mode: normal;
+  will-change: opacity;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+[data-theme="light"] .hero-subtitle{
+  /* stronger brand color and weight for legibility on light backgrounds */
+  color: var(--brand) !important; /* #0d7377 */
+  font-weight: 800 !important;
+  text-shadow: 0 2px 12px rgba(13, 115, 119, 0.08) !important;
+  letter-spacing: 0.25px;
+  opacity: 1 !important;
+}
+
+[data-theme="light"] .lead{
+  /* darker, higher-contrast body copy in light mode */
+  color: #0b1220 !important; /* near-black for clarity */
+  font-weight: 600 !important;
+  line-height: 1.75 !important;
+  opacity: 1 !important;
+}
+
+[data-theme="light"] .cta-row .btn{
+  /* ensure CTAs are readable and prominent */
+  color: #ffffff !important;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+[data-theme="light"] .wave-emoji{
+  display: inline-block;
+  font-size: 1.1em;
+  margin-left: 0.3em;
+  animation: wave 0.6s ease-in-out infinite;
+}
+
+[data-theme="light"] .fast-response{
+  /* Match dark-mode sizing and positioning exactly */
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 0.75rem;
+  /* Light-mode colors only */
+  background: linear-gradient(135deg, #0d7377, #0a5c5f);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(13, 115, 119, 0.2);
+  letter-spacing: 0.3px;
+  /* Ensure the badge keeps its content on one line and has a minimum width */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem; /* space between emoji and text */
+  white-space: nowrap; /* prevent wrapping of "⚡ Fast Response" */
+  min-width: 200px; /* keep the badge at least 200px wide on larger screens */
+  animation: pulse 2s infinite; /* match dark-mode animation */
+}
+
+[data-theme="light"] .highlight-text{
+  display: inline;
+  color: #0d7377 !important;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(11, 110, 253, 0.1), rgba(6, 182, 212, 0.08));
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+[data-theme="light"] .btn.btn-primary{
+  background: var(--brand) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 28px rgba(13,115,119,0.12);
+}
+
+[data-theme="light"] .btn.btn-ghost{
+  background: transparent !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(16,24,40,0.06) !important;
+}
+
+/* Stronger hero CTA variants in light mode */
+[data-theme="light"] .hero .cta-row .btn.btn-primary{
+  background: #0747c8 !important; /* darker blue for prominent CTA */
+  border-color: #053ea3 !important;
+  color: #ffffff !important;
+  padding:0.95rem 2.2rem !important;
+  font-weight:800 !important;
+  box-shadow: 0 14px 34px rgba(7,71,200,0.12) !important;
+}
+
+/* Make the primary "Hire Me" button black only in light mode. Use a specific class so
+   other primary CTAs keep the darker-blue look. */
+[data-theme="light"] .hero .cta-row .btn.btn-primary.hire-me{
+  background: linear-gradient(to right, #000000, #959595) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18) !important;
+}
+
+[data-theme="light"] .hero .cta-row .btn.btn-primary.hire-me:hover{
+  filter:brightness(0.95) !important;
+  transform: translateY(-2px) !important;
+}
+
+[data-theme="light"] .hero .cta-row .btn.btn-ghost{
+  background: rgba(7, 29, 67, 0.03) !important; /* subtle darker ghost background */
+  color: #071423 !important; /* darker text */
+  border: 1px solid rgba(68, 68, 68, 0.756) !important;
+  padding:0.85rem 1.6rem !important;
+  font-weight:700 !important;
+}
+
+[data-theme="light"] .hero .cta-row .btn.btn-ghost:hover{
+  background: rgba(18, 3, 3, 0.06) !important;
+}
+
+[data-theme="light"] .fast-response,
+[data-theme="light"] .highlight-text{
+  /* make inline badges clearly readable on light background */
+  color: #0b1220 !important;
+}
+
+/* Theme toggle button (visible and obvious) */
+.theme-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.45rem;
+  padding:0.45rem 0.65rem;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+  font-size:1rem;
+  line-height:1;
+  color:inherit;
+  transition:transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.theme-icon {
+  /* Minimal transparent icon: preserve emoji/SVG color but no filled badge */
+  display:inline-grid;
+  place-items:center;
+  width:20px;
+  height:20px;
+  font-size:18px;
+  line-height:1;
+  transition: transform 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+  background: transparent; /* keep background transparent per request */
+  color: inherit;
+  box-shadow: none;
+}
+/* Larger hit area and focus ring for accessibility */
+.theme-toggle{padding:0.35rem 0.6rem}
+.theme-toggle:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(11,110,253,0.14)}
+
+/* Use subtle transforms but keep background transparent; visual state relies on emoji glyph */
+.theme-toggle[aria-pressed="true"] .theme-icon{
+  transform: none;
+}
+
+.theme-toggle[aria-pressed="false"] .theme-icon{
+  transform: none;
+}
+
+/* Gentle hover micro-interaction */
+.theme-toggle:hover .theme-icon{transform:translateY(-2px)}
+.theme-toggle:active .theme-icon{transform:translateY(0)}
+
+.theme-toggle:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(2,6,23,0.12)}
+.theme-toggle:active .theme-icon {
+  transform: rotate(180deg) scale(1.2);
+}
+
+/* Make the toggle visually reflect light mode when active */
+[data-theme="light"] .theme-toggle{
+  background: linear-gradient(90deg,#fff,#f3f8ff);
+  border:1px solid rgba(16,24,40,0.06);
+  color:var(--text);
+  box-shadow:0 6px 20px rgba(16,24,40,0.06);
+}
+
+/* Elements that end up with very light text in dark-mode may be hard to read in light mode.
+   Add a small darker pill background to improve legibility when in light mode. JS will add
+   the `.needs-dark-bg` class to elements that require it. */
+[data-theme="light"] .needs-dark-bg{
+  background: rgba(0,0,0,0.06);
+  color:var(--text);
+  padding:0.12rem 0.5rem;
+  border-radius:6px;
+  display:inline-block;
+}
+
+/* Specific tweak for highlighted inline text in light mode */
+[data-theme="light"] .highlight-text{
+  background: linear-gradient(90deg,#fff5d6,#fff3cc);
+  color: #0b1220;
+  padding:0.18rem 0.45rem;
+  border-radius:6px;
+}
+
 
 .container{max-width:var(--max-width);margin:0 auto;padding:0 var(--container-pad)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-/* Header */
-.site-header{border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(11,110,253,0.05),rgba(11,110,253,0.02));backdrop-filter:blur(10px);position:fixed;top:0;left:0;right:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.3);width:100%;padding:0.5rem 0 0 1rem;will-change:transform;transform:translateZ(0)}
+.site-header{
+  border-bottom: 1px solid var(--border);
+  /* Use the solid theme background variable to ensure the header is opaque in all themes */
+  background: var(--bg);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  width: 100%;
+  padding: 0.5rem 0 0 1rem;
+  will-change: transform;
+  transform: translateZ(0);
+}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
 .brand{display:flex;align-items:center;gap:0.75rem;text-decoration:none;color:inherit;transition:all 0.3s ease;will-change:transform}
 .brand:hover{opacity:0.85;transform:scale(1.02)}
-.brand-logo{width:36px;height:36px;object-fit:contain;transition:all 0.3s ease;filter:drop-shadow(0 0 8px rgba(11,110,253,0.4));will-change:filter}
+.brand-logo{width:36px;height:36px;object-fit:contain;transition:all 0.3s ease;filter:drop-shadow(0 0 8px rgba(13,115,119,0.4));will-change:filter}
 .brand:hover .brand-logo{filter:drop-shadow(0 0 12px rgba(251,191,36,0.6));transform:rotate(5deg) scale(1.05)}
 .brand-name{font-weight:800;font-size:1.15rem;letter-spacing:-0.02em;text-transform:uppercase;display:inline-flex;align-items:center;gap:0.1rem}
 .brand-enoch{color:#fff;background:#000;padding:0.15rem 0.3rem;border-radius:4px;line-height:1}
@@ -64,9 +830,46 @@ body{
 .nav a{color:inherit;text-decoration:none;padding:0.6rem 1rem;border-radius:10px;transition:all 0.3s ease;font-weight:500;font-size:0.95rem;position:relative;will-change:background,color,transform}
 .nav a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#06b6d4,#fbbf24);transition:width 0.3s ease;will-change:width}
 .nav a:hover::after{width:100%}
-.nav a:hover{background:rgba(11,110,253,0.08);color:#fbbf24;transform:translateY(-2px)}
+.nav a:hover{background:rgba(13,115,119,0.08);color:#fbbf24;transform:translateY(-2px)}
 .nav a.active{color:#fbbf24;background:rgba(251,191,36,0.1)}
 .nav a.active::after{width:100%}
+
+/* Light Mode Navigation Styling */
+[data-theme="light"] .nav a{
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: 0.3px;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] .nav a::after{
+  background: linear-gradient(90deg, #0d7377, #06b6d4);
+  height: 3px;
+  bottom: -4px;
+}
+
+[data-theme="light"] .nav a:hover{
+  background: rgba(13, 115, 119, 0.08);
+  color: #0d7377;
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .nav a:hover::after{
+  width: 100%;
+}
+
+[data-theme="light"] .nav a.active{
+  color: #0d7377;
+  background: rgba(13, 115, 119, 0.1);
+  font-weight: 700;
+}
+
+[data-theme="light"] .nav a.active::after{
+  width: 100%;
+  background: linear-gradient(90deg, #0d7377, #0747c8);
+}
 
 /* Adjust body to account for fixed header */
 body{padding-top:70px}
@@ -512,7 +1315,7 @@ body{padding-top:70px}
 .hero{padding:4rem 0;position:relative;overflow:hidden}
 #hero,
 #about{padding-top:20px}
-.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%, rgba(11,110,253,0.08), transparent 50%),radial-gradient(circle at 80% 80%, rgba(251,191,36,0.05), transparent 50%);pointer-events:none;z-index:0}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%, rgba(13,115,119,0.08), transparent 50%),radial-gradient(circle at 80% 80%, rgba(251,191,36,0.05), transparent 50%);pointer-events:none;z-index:0}
 .hero-inner{display:grid;grid-template-columns:1fr 380px;gap:2rem;align-items:center;position:relative;z-index:1}
 .hero-copy{animation:slideInLeft 0.8s ease-out}
 .hero-copy h1{font-size:clamp(1.8rem,4.2vw,3rem);margin:0 0 .75rem;font-weight:800;background:linear-gradient(135deg,#f0f4f8,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.02em;line-height:1.2}
@@ -527,35 +1330,98 @@ body{padding-top:70px}
 @keyframes slideInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .cta-row{display:flex;gap:.75rem;flex-wrap:wrap}
 
-.fast-response{display:inline-block;background:linear-gradient(135deg,#fbbf24,#fcd34d);color:#000;padding:0.35rem 0.8rem;border-radius:20px;font-size:0.8rem;font-weight:700;margin-left:0.75rem;animation:pulse 2s infinite}
+.fast-response{display:inline-flex;background:linear-gradient(135deg,#fbbf24,#fcd34d);color:#000;padding:0.35rem 0.8rem;border-radius:20px;font-size:0.8rem;font-weight:700;margin-left:0.75rem;animation:pulse 2s infinite;
+  /* Keep the badge on one line and enforce a comfortable minimum width on larger viewports */
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem; /* space between emoji and text */
+  white-space: nowrap; /* prevent wrapping of "⚡ Fast Response" on desktop/dark mode */
+  min-width: 200px;
+}
 .highlight-text{display:inline;color:#ffe1a5;font-weight:400}
 
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
 
 @media (max-width:768px){
-  .fast-response{font-size:0.7rem;padding:0.3rem 0.6rem;margin-left:0;margin-top:0.5rem;display:block}
+  .fast-response{font-size:0.7rem;padding:0.3rem 0.6rem;margin-left:0;margin-top:0.5rem;display:block;white-space:normal;min-width:0}
+  [data-theme="light"] .fast-response{font-size:0.7rem;padding:0.3rem 0.6rem;margin-left:0;margin-top:0.5rem;display:block;white-space:normal;min-width:0}
 }
 
 @media (max-width:480px){
-  .fast-response{font-size:0.65rem;padding:0.25rem 0.5rem;max-width:120px;word-break:break-word}
+  .fast-response{font-size:0.65rem;padding:0.25rem 0.5rem;max-width:120px;word-break:break-word;white-space:normal;min-width:0}
+  [data-theme="light"] .fast-response{font-size:0.65rem;padding:0.25rem 0.5rem;max-width:120px;word-break:break-word;white-space:normal;min-width:0}
 }
 
 .hero-card{margin-top:-2rem}
-.hero-card .card-mock{background:linear-gradient(180deg,var(--bg),rgba(11,110,253,0.05));border-radius:14px;padding:1.25rem;box-shadow:0 8px 30px rgba(11,110,253,0.08);border:1px solid var(--border-light);position:relative;overflow:hidden}
-.hero-card .card-mock::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(11,110,253,0.3),transparent)}
-.mock-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(11,110,253,0.1)}
-.header-icon{width:32px;height:32px;background:linear-gradient(135deg,rgba(6,182,212,0.25),rgba(11,110,253,0.15));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#06b6d4;flex-shrink:0}
+.hero-card .card-mock{background:linear-gradient(180deg,var(--bg),rgba(13,115,119,0.05));border-radius:14px;padding:1.25rem;box-shadow:0 12px 48px rgba(0,0,0,0.5), 0 0 0 2px rgba(13,115,119,0.2);border:1px solid var(--border-light);position:relative;overflow:hidden}
+.hero-card .card-mock::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(13,115,119,0.3),transparent)}
+
+[data-theme="light"] .hero-card .card-mock{
+  box-shadow:0 12px 48px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(13,115,119,0.1) !important;
+}
+.mock-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(13,115,119,0.1)}
+.header-icon{width:32px;height:32px;background:linear-gradient(135deg,rgba(6,182,212,0.25),rgba(13,115,119,0.15));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#06b6d4;flex-shrink:0}
 .header-content{display:flex;flex-direction:column;gap:0.35rem;flex:1}
 .header-title{font-size:1.3rem;font-weight:800;color:#fff5ab;display:block;letter-spacing:-0.01em;margin:0}
 .header-subtitle{font-size:1rem;font-weight:600;color:var(--text-secondary);display:block;line-height:1.4}
 .header-subtitle.polymer{color:var(--text-secondary);opacity:1;font-weight:300}
+
+/* Make header content darker and more legible in light mode */
+[data-theme="light"] .header-content{
+  color: var(--text) !important;
+}
+[data-theme="light"] .header-content .header-title,
+[data-theme="light"] .header-content .header-title.section-title{
+  color: #071423 !important; /* near-black title for strong contrast */
+  font-weight:900 !important;
+  text-shadow: none !important;
+}
+[data-theme="light"] .header-content .header-subtitle,
+[data-theme="light"] .header-content .header-subtitle.polymer{
+  color: #334155 !important; /* darker secondary */
+  font-weight:600 !important;
+  opacity:0.95 !important;
+}
+
+/* Make mock-body content darker and more legible in light mode */
+[data-theme="light"] .mock-body{
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .mock-body .section-label{
+  color: #0b1220 !important;
+  font-weight:700 !important;
+}
+
+[data-theme="light"] .mock-body .expertise-title{
+  color: #071423 !important; /* near-black */
+  font-weight:800 !important;
+}
+
+[data-theme="light"] .mock-body .expertise-desc{
+  color: #334155 !important;
+  font-weight:500 !important;
+}
+
+[data-theme="light"] .mock-body .expertise-icon{
+  color: #0369a1 !important; /* keep icon accent but slightly darker */
+}
+
+[data-theme="light"] .mock-body .body-divider{
+  background: linear-gradient(90deg, transparent, rgba(7,20,35,0.06), transparent) !important;
+}
+
+[data-theme="light"] .mock-body .mission-text{
+  color: #334155 !important;
+  font-weight:500 !important;
+}
 
 /* Mobile responsive for header-content */
 @media (max-width:768px){
   .header-content{gap:0.3rem}
   .header-title{font-size:1.1rem}
   .header-subtitle{font-size:0.95rem}
-  .fast-response{display:block;margin-left:0;margin-top:0.5rem}
+  .fast-response{display:block;margin-left:0;margin-top:0.5rem;white-space:normal;min-width:0}
 }
 
 
@@ -672,6 +1538,33 @@ body{padding-top:70px}
 
   /* ensure carousel nav buttons remain usable but unobtrusive */
   .carousel-nav{width:40px;height:40px}
+
+  /* Reduce contact section height on mobile */
+  #contact {
+    padding: 1.5rem 0;
+  }
+
+  .contact-wrapper {
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-left-section {
+    flex: 0 0 auto;
+  }
+
+  .contact-form-section {
+    padding: 1.5rem;
+  }
+
+  .contact-cards-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-card {
+    width: 100%;
+  }
 }
 .section-title{margin:0 0 .25rem;font-size:1.25rem}
 .section-sub{color:var(--muted);margin:0 0 1rem}
@@ -711,11 +1604,97 @@ body{padding-top:70px}
   -webkit-backdrop-filter:blur(6px) saturate(110%);
   border-radius:14px;
   padding:1.5rem;
-  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.6s ease;
   cursor:default;
   position:relative;
   overflow:hidden;
   box-shadow:0 8px 28px rgba(2,6,23,0.36);
+}
+
+/* Very-white variant for the Virtual Assistance card (explicitly bright white)
+   Applies only in light theme so dark mode keeps original styling. */
+[data-theme="light"] .service-card.va-white{
+  /* Bright, elevated white surface that clearly supersedes the page background */
+  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%) !important;
+  color:#071423 !important; /* near-black text for strong contrast */
+  border:1px solid rgba(7,20,35,0.06) !important;
+  box-shadow:0 12px 48px rgba(0, 0, 0, 0.48), 0 0 0 2px rgba(13,115,119,0.1) !important;
+  backdrop-filter:none !important;
+  position:relative;
+  z-index:30; /* sit above surrounding surface */
+  transform:translateZ(0);
+  filter:brightness(1.02); /* subtle extra pop */
+  overflow:visible;
+  border-radius:14px;
+}
+
+[data-theme="light"] .service-card.va-white::before{
+  /* subtle white sheen overlay to increase perceived brightness */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0)) ;
+  mix-blend-mode: normal;
+  box-shadow: 0 6px 30px rgba(255,255,255,0.45) inset;
+  opacity: 1;
+}
+
+[data-theme="light"] .service-card.va-white::after{
+  /* soft colored glow beneath the card to lift it from the background */
+  content: '';
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  bottom: -18px;
+  height: 72px;
+  filter: blur(18px);
+  background: radial-gradient(closest-side, rgba(13,115,119,0.06), transparent);
+  z-index: -1;
+  pointer-events: none;
+}
+
+[data-theme="light"] .service-card.va-white .service-icon{
+  background:linear-gradient(135deg,#f7fafc,#eef6fb) !important;
+  color:#0d7377 !important; /* brand-accent for the icon */
+  box-shadow:none !important;
+}
+
+[data-theme="light"] .service-card.va-white h3{
+  color:#071423 !important;
+}
+
+[data-theme="light"] .service-card.va-white p{
+  color:#334155 !important;
+}
+
+[data-theme="light"] .service-card.va-white .tag{
+  background:#f8fafc !important;
+  color:#0b1220 !important;
+  border:1px solid rgba(7,20,35,0.06) !important;
+}
+
+[data-theme="light"] .service-card.va-white:focus,
+[data-theme="light"] .service-card.va-white:focus-within{
+  box-shadow:0 22px 60px rgba(2,6,23,0.12) !important;
+  outline:3px solid rgba(13,115,119,0.06) !important;
+}
+
+/* Light mode service card styling */
+[data-theme="light"] .service-card{
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%) !important;
+  border: 1px solid rgba(13, 115, 119, 0.15) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 8px 24px rgba(13, 115, 119, 0.08) !important;
+}
+
+[data-theme="light"] .service-card:hover,
+[data-theme="light"] .service-card:focus-within {
+  transform: translateY(-8px);
+  border-color: rgba(13, 115, 119, 0.25) !important;
+  box-shadow: 0 16px 40px rgba(13, 115, 119, 0.12) !important;
 }
 
 .service-card::before{
@@ -725,7 +1704,7 @@ body{padding-top:70px}
   right:-30%;
   width:220px;
   height:220px;
-  background:radial-gradient(circle, rgba(11,110,253,0.08), transparent 50%);
+  background:radial-gradient(circle, rgba(13,115,119,0.08), transparent 50%);
   border-radius:50%;
   opacity:0;
   transition:opacity 0.28s ease;
@@ -734,7 +1713,7 @@ body{padding-top:70px}
 .service-card:hover,
 .service-card:focus-within{
   transform:translateY(-8px);
-  border-color:rgba(11,110,253,0.12);
+  border-color:rgba(13,115,119,0.12);
   box-shadow:0 18px 46px rgba(2,6,23,0.5);
 }
 
@@ -753,12 +1732,27 @@ body{padding-top:70px}
   align-items:center;
   justify-content:center;
   border-radius:10px;
-  background:linear-gradient(135deg, rgba(11,110,253,0.12), rgba(6,182,212,0.06));
+  background:linear-gradient(135deg, rgba(13,115,119,0.12), rgba(6,182,212,0.06));
   color:var(--text);
-  box-shadow:0 6px 18px rgba(11,110,253,0.06);
+  box-shadow:0 6px 18px rgba(13,115,119,0.06);
+  transition: background 0.6s ease, box-shadow 0.6s ease;
 }
 
-.service-card h3{margin:0;font-size:1.12rem;color:var(--card-heading);font-weight:800;letter-spacing:-0.01em}
+/* Light mode service icon */
+[data-theme="light"] .service-icon {
+  background: linear-gradient(135deg, rgba(13, 115, 119, 0.15), rgba(6, 182, 212, 0.1)) !important;
+  box-shadow: 0 4px 12px rgba(13, 115, 119, 0.1) !important;
+  color: var(--text) !important;
+}
+
+.service-card h3{
+  margin:0;
+  font-size:1.12rem;
+  color:var(--card-heading);
+  font-weight:800;
+  letter-spacing:-0.01em;
+  transition: color 0.6s ease;
+}
 
 .service-card h3::after{
   content:'';
@@ -771,16 +1765,76 @@ body{padding-top:70px}
   opacity:0.95;
 }
 
-.service-card p{color:var(--card-body);font-size:0.95rem;line-height:1.6;margin:0.85rem 0 1rem;font-weight:500}
+.service-card p{
+  color:var(--card-body);
+  font-size:0.95rem;
+  line-height:1.6;
+  margin:0.85rem 0 1rem;
+  font-weight:500;
+  transition: color 0.6s ease;
+}
+
+/* Light mode paragraph text */
+[data-theme="light"] .service-card p {
+  color: var(--text-secondary) !important;
+}
 
 .service-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.9rem}
 
-.tag{display:inline-block;background:linear-gradient(135deg,rgba(11,110,253,0.06),rgba(6,182,212,0.04));color:#cfeefd;padding:0.36rem 0.7rem;border-radius:10px;font-size:0.78rem;font-weight:700;border:1px solid rgba(255,255,255,0.03);transition:transform 0.16s ease, box-shadow 0.16s ease}
+.tag{
+  display:inline-block;
+  background:linear-gradient(135deg,rgba(13,115,119,0.06),rgba(6,182,212,0.04));
+  color:#cfeefd;
+  padding:0.36rem 0.7rem;
+  border-radius:10px;
+  font-size:0.78rem;
+  font-weight:700;
+  border:1px solid rgba(255,255,255,0.03);
+  transition:transform 0.16s ease, box-shadow 0.16s ease, background 0.6s ease, color 0.6s ease, border-color 0.6s ease;
+}
+
+/* Light mode tag styling */
+[data-theme="light"] .tag {
+  background: linear-gradient(135deg, rgba(13, 115, 119, 0.1), rgba(6, 182, 212, 0.08)) !important;
+  color: rgba(13, 115, 119, 0.8) !important;
+  border: 1px solid rgba(13, 115, 119, 0.2) !important;
+}
+
+/* Highlight specific Virtual Assistance tags in light mode so they stand out clearly */
+[data-theme="light"] .tag.highlight{
+  /* Black pill with white text as requested */
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight:800 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45) !important;
+  padding:0.42rem 0.9rem !important;
+  border-radius:12px !important;
+  transform: translateZ(0);
+}
+
+[data-theme="light"] .tag.highlight:hover,
+[data-theme="light"] .tag.highlight:focus{
+  transform: translateY(-3px) !important;
+  /* Subtle light rim to lift the pill against very light backgrounds */
+  box-shadow: 0 14px 36px rgba(255,255,255,0.06) !important;
+}
+
+/* Slightly increase size on small screens for tappability */
+@media (max-width:480px){
+  [data-theme="light"] .tag.highlight{padding:0.48rem 1rem !important;font-size:0.9rem !important}
+}
+
+[data-theme="light"] .tag:hover,
+[data-theme="light"] .tag:focus {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(13, 115, 119, 0.12) !important;
+}
 
 .tag:hover,
 .tag:focus{
   transform:translateY(-3px);
-  box-shadow:0 10px 24px rgba(11,110,253,0.06);
+  box-shadow:0 10px 24px rgba(13,115,119,0.06);
 }
 
 /* Mobile responsive for services section */
@@ -809,14 +1863,14 @@ body{padding-top:70px}
 
 .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
 .plan{padding:1rem;border-radius:12px;border:1px solid var(--border);background:var(--bg);text-align:center}
-.plan.featured{transform:translateY(-6px);box-shadow:0 18px 40px rgba(11,110,253,0.08);border-color:rgba(11,110,253,0.12)}
+.plan.featured{transform:translateY(-6px);box-shadow:0 18px 40px rgba(13,115,119,0.08);border-color:rgba(13,115,119,0.12)}
 .price{font-weight:700;font-size:1.25rem;margin:.5rem 0}
 
 .contact-grid{display:grid;grid-template-columns:1fr 320px;gap:1.25rem;align-items:start}
 
 .portfolio-carousel-wrapper{display:flex;align-items:center;gap:1.5rem;position:relative;margin-left:calc(-50vw + 50%);margin-right:calc(-50vw + 50%);padding-left:15px;padding-right:15px;width:100vw}
-.carousel-nav{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#0b6efd,#0ea5e9);border:none;color:#fff;cursor:pointer;transition:all 0.3s ease;flex-shrink:0;will-change:transform,box-shadow;position:relative;z-index:10}
-.carousel-nav:hover{transform:scale(1.1);box-shadow:0 8px 20px rgba(11,110,253,0.4)}
+.carousel-nav{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#0d7377,#0ea5e9);border:none;color:#fff;cursor:pointer;transition:all 0.3s ease;flex-shrink:0;will-change:transform,box-shadow;position:relative;z-index:10}
+.carousel-nav:hover{transform:scale(1.1);box-shadow:0 8px 20px rgba(13,115,119,0.4)}
 .carousel-nav:active{transform:scale(0.95)}
 .carousel-prev{order:1}
 .carousel-next{order:3}
@@ -825,11 +1879,11 @@ body{padding-top:70px}
 .portfolio-grid{display:flex;flex-direction:row;gap:1.5rem;padding:1rem 15px;min-width:100%;width:max-content}
 .portfolio-item{background:var(--bg);border:1px solid var(--border-light);border-radius:14px;overflow:hidden;transition:all 0.3s ease;will-change:transform,box-shadow;display:flex;flex-direction:column;flex-shrink:0;width:320px;height:fit-content}
 .portfolio-item{
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(11,110,253,0.02));
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(13,115,119,0.02));
   border:1px solid rgba(255,255,255,0.04);
   border-radius:14px;
   overflow:hidden;
-  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.6s ease;
   will-change:transform,box-shadow;
   display:flex;
   flex-direction:column;
@@ -839,6 +1893,89 @@ body{padding-top:70px}
   box-shadow:0 10px 30px rgba(2,6,23,0.36);
 }
 
+/* Light mode portfolio item styling */
+[data-theme="light"] .portfolio-item {
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%) !important;
+  border: 1px solid rgba(11, 110, 253, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(11, 110, 253, 0.08) !important;
+}
+
+/* Bright, elevated white variant for a featured portfolio card in light mode */
+[data-theme="light"] .portfolio-item.va-white{
+  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%) !important;
+  color: #071423 !important;
+  border: 1px solid rgba(7,20,35,0.06) !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(13,115,119,0.1) !important;
+  position: relative;
+  z-index: 30; /* lift above surrounding items */
+  transform: translateZ(0);
+  filter:brightness(1.02);
+  border-radius:14px;
+  overflow: visible;
+}
+
+[data-theme="light"] .portfolio-item.va-white::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+  mix-blend-mode: normal;
+  box-shadow: 0 6px 30px rgba(255,255,255,0.45) inset;
+  opacity: 1;
+}
+
+[data-theme="light"] .portfolio-item.va-white::after{
+  content: '';
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  bottom: -18px;
+  height: 72px;
+  filter: blur(18px);
+  background: radial-gradient(closest-side, rgba(11,110,253,0.06), transparent);
+  z-index: -1;
+  pointer-events: none;
+}
+
+[data-theme="light"] .portfolio-item.va-white h3{
+  color: #071423 !important;
+}
+
+[data-theme="light"] .portfolio-item.va-white .portfolio-desc{
+  color: #334155 !important;
+}
+
+[data-theme="light"] .portfolio-item.va-white:focus,
+[data-theme="light"] .portfolio-item.va-white:focus-within{
+  box-shadow: 0 22px 60px rgba(2,6,23,0.12) !important;
+  outline: 3px solid rgba(13,115,119,0.06) !important;
+}
+
+[data-theme="light"] .portfolio-item:hover,
+[data-theme="light"] .portfolio-item:focus {
+  transform: translateY(-10px);
+  border-color: rgba(11, 110, 253, 0.25) !important;
+  box-shadow: 0 20px 48px rgba(11, 110, 253, 0.12) !important;
+}
+
+/* Light mode featured portfolio item */
+[data-theme="light"] .portfolio-item.featured {
+  border: 2px solid rgba(251, 191, 36, 0.25) !important;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(11, 110, 253, 0.03)) !important;
+}
+
+[data-theme="light"] .portfolio-item.featured:hover {
+  box-shadow: 0 20px 48px rgba(251, 191, 36, 0.15) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+}
+
+/* Make featured portfolio headings black in light mode (e.g. "SEO Transformation") */
+[data-theme="light"] .portfolio-item.featured h3{
+  color: #000 !important;
+}
+
 .portfolio-item:hover,
 .portfolio-item:focus{
   transform:translateY(-10px);
@@ -846,21 +1983,201 @@ body{padding-top:70px}
   border-color:rgba(11,110,253,0.12);
 }
 
-.portfolio-image{height:200px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;overflow:hidden}
-.portfolio-image::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;transition:opacity 0.28s ease}
-.portfolio-item:hover .portfolio-image::before{opacity:0.08;background:rgba(255,255,255,0.04)}
-.portfolio-icon{display:inline-block;transition:transform 0.25s ease}
-.portfolio-item:hover .portfolio-icon{transform:scale(1.08)}
+.portfolio-image{
+  height:200px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3.2rem;
+  position:relative;
+  overflow:hidden;
+  transition: filter 0.6s ease;
+}
 
-.portfolio-item h3{font-size:1.12rem;margin:1rem 1.1rem 0.5rem;font-weight:800;color:var(--card-heading)}
-.portfolio-item h3::after{content:'';display:block;height:3px;width:44px;margin-top:8px;border-radius:3px;background:linear-gradient(90deg,var(--card-heading-accent), rgba(255,255,255,0.06));opacity:0.95}
-.portfolio-desc{font-size:0.92rem;color:var(--card-body);margin:0 1.1rem;line-height:1.5;flex-grow:1}
+/* Ensure the top corners of the portfolio image follow the card radius
+   Especially important for `.portfolio-item.va-white` where the parent
+   may be `overflow: visible` to allow a glow; we must round and clip the
+   image itself so it matches the card's rounded corners on the top-left/right. */
+.portfolio-item .portfolio-image{
+  border-top-left-radius: 20px; /* match unified card radius */
+  border-top-right-radius: 20px; /* match unified card radius */
+  overflow: hidden; /* clip any child content or background */
+}
+
+/* Scoped rule for light-mode variant as well (keeps specificity and safety) */
+[data-theme="light"] .portfolio-item.va-white .portfolio-image{
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+.portfolio-image::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  opacity:0;
+  transition:opacity 0.28s ease;
+}
+
+.portfolio-item:hover .portfolio-image::before{
+  opacity:0.08;
+  background:rgba(255,255,255,0.04);
+}
+
+/* Light mode portfolio image overlay */
+[data-theme="light"] .portfolio-item:hover .portfolio-image::before {
+  opacity: 0.05;
+  background: rgba(11, 110, 253, 0.05) !important;
+}
+
+.portfolio-icon{
+  display:inline-block;
+  transition:transform 0.25s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.portfolio-item:hover .portfolio-icon{
+  transform:scale(1.08);
+}
+
+.portfolio-item h3{
+  font-size:1.12rem;
+  margin:1rem 1.1rem 0.5rem;
+  font-weight:800;
+  color:var(--card-heading);
+  transition: color 0.6s ease;
+}
+
+.portfolio-item h3::after{
+  content:'';
+  display:block;
+  height:3px;
+  width:44px;
+  margin-top:8px;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--card-heading-accent), rgba(255,255,255,0.06));
+  opacity:0.95;
+  transition: background 0.6s ease;
+}
+
+/* Light mode portfolio heading */
+[data-theme="light"] .portfolio-item h3 {
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .portfolio-item h3::after {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.6), rgba(11, 110, 253, 0.3)) !important;
+}
+
+[data-theme="light"] .portfolio-item.featured h3 {
+  color: rgba(251, 191, 36, 0.9) !important;
+}
+
+.portfolio-desc{
+  font-size:0.92rem;
+  color:var(--card-body);
+  margin:0 1.1rem;
+  line-height:1.5;
+  flex-grow:1;
+  transition: color 0.6s ease;
+}
+
+/* Light mode portfolio description */
+[data-theme="light"] .portfolio-desc {
+  color: var(--text-secondary) !important;
+}
 
 .portfolio-item .btn{margin:0.85rem 1.1rem 1rem;align-self:start}
+
+/* Light-mode mobile navigation overrides
+   - Ensure the slide-out mobile nav is bright and legible in light (white) mode
+   - Use green/cyan accents (#0d7377 / #06b6d4) and black primary CTA where appropriate
+*/
+@media (max-width:1023px) {
+  [data-theme="light"] .nav {
+    background: linear-gradient(180deg,#ffffff 0%,#f7fff7 100%) !important;
+    border-left: 1px solid rgba(13,115,119,0.06) !important;
+    box-shadow: -8px 0 30px rgba(13,115,119,0.06) !important;
+    color: var(--text) !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Ensure the open state keeps the light styling and subtle lift */
+  [data-theme="light"] .nav.open{
+    transform: translate3d(0,0,0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    box-shadow: -10px 0 40px rgba(13,115,119,0.08) !important;
+  }
+
+  [data-theme="light"] .nav a{
+    color: #071423 !important; /* near-black for strong contrast */
+    background: transparent !important;
+    font-weight: 700 !important;
+  }
+
+  [data-theme="light"] .nav a:hover{
+    background: rgba(13,115,119,0.06) !important; /* subtle green-cyan hover */
+    color: #0d7377 !important; /* brand green-cyan */
+    transform: translateX(-4px) !important;
+  }
+
+  /* Active/selected item should show a clear green accent and a subtle cyan gradient */
+  [data-theme="light"] .nav a.active{
+    background: linear-gradient(135deg, rgba(13,115,119,0.12), rgba(6,182,212,0.06)) !important;
+    color: #0d7377 !important;
+    font-weight: 800 !important;
+    border-left: 4px solid #0d7377 !important;
+    padding-left: calc(1.25rem - 4px) !important;
+    box-shadow: inset 0 0 10px rgba(13,115,119,0.03) !important;
+  }
+
+  /* Ensure the mobile primary CTA inside the nav is black with white text (as requested) */
+  [data-theme="light"] .nav a.btn.btn-primary{
+    background: linear-gradient(90deg,#000000,#222222) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18) !important;
+    display: inline-block !important;
+    padding: 0.7rem 1rem !important;
+    text-align: center !important;
+  }
+
+  [data-theme="light"] .nav a.btn.btn-primary:hover{
+    filter: brightness(0.95) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  /* Make the hamburger/nav toggle visible and dark in light mode */
+  [data-theme="light"] .nav-toggle{
+    color: var(--text) !important;
+  }
+}
 .portfolio-item .btn{margin:0.85rem 1.1rem 1rem;display:inline-block;font-size:0.87rem}
-.portfolio-item.featured{border:2px solid rgba(251,191,36,0.3);background:linear-gradient(135deg, rgba(251,191,36,0.05), rgba(11,110,253,0.02))}
-.portfolio-item.featured:hover{box-shadow:0 24px 60px rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.5)}
-.portfolio-item.featured h3{color:#fcd34d}
+
+.portfolio-item.featured{
+  border:2px solid rgba(251,191,36,0.3);
+  background:linear-gradient(135deg, rgba(251,191,36,0.05), rgba(11,110,253,0.02));
+  transition: border-color 0.6s ease, background 0.6s ease;
+}
+
+.portfolio-item.featured:hover{
+  box-shadow:0 24px 60px rgba(251,191,36,0.15);
+  border-color:rgba(251,191,36,0.5);
+}
+
+.portfolio-item.featured h3{
+  color:#fcd34d;
+  transition: color 0.6s ease;
+}
+
+/* Light mode featured portfolio */
+[data-theme="light"] .portfolio-item.featured h3 {
+  color: rgba(251, 191, 36, 0.9) !important;
+}
 
 @media (max-width:768px){
   .portfolio-carousel-wrapper{gap:1rem}
@@ -903,6 +2220,21 @@ body{padding-top:70px}
   max-width:600px;
 }
 
+/* Light mode contact section header */
+[data-theme="light"] #contact .section-title {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="light"] #contact .section-sub {
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+}
+
 .contact-form{background:var(--bg);padding:1rem;border-radius:12px;border:1px solid var(--border-light)}
 
 .contact-wrapper{
@@ -931,6 +2263,19 @@ body{padding-top:70px}
   backdrop-filter:blur(10px);
   position:relative;
   overflow:hidden;
+  transition: background 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+/* Light mode contact form section - PROMINENT, ELEVATED STYLE */
+[data-theme="light"] .contact-form-section {
+  /* Bright white gradient with subtle blue accent tint */
+  background: linear-gradient(135deg, #ffffff 0%, #f5fbff 100%) !important;
+  border: 2px solid rgba(13, 115, 119, 0.25) !important;
+  box-shadow: 0 16px 56px rgba(13, 115, 119, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  /* Extra visual pop with a subtle shadow glow */
+  filter: drop-shadow(0 12px 40px rgba(13, 115, 119, 0.08));
 }
 
 /* Tweak contact form labels and controls to match card accents */
@@ -938,9 +2283,68 @@ body{padding-top:70px}
   color:var(--card-heading);
   font-weight:800;
   letter-spacing:0.6px;
+  transition: color 0.6s ease;
+}
+
+/* Light mode label text - STRONG CONTRAST */
+[data-theme="light"] .contact-form-section .label-text {
+  color: #071423 !important; /* Near-black for maximum contrast */
+  font-weight: 900 !important;
+  font-size: 0.96rem !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase;
+  opacity: 1;
 }
 
 .contact-form-section .form-group{margin-bottom:1.05rem}
+
+/* Form notice styling for light mode */
+[data-theme="light"] .contact-form-section .form-notice {
+  background: linear-gradient(135deg, rgba(13, 115, 119, 0.08), rgba(6, 182, 212, 0.05)) !important;
+  border: 1.5px solid rgba(13, 115, 119, 0.2) !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  margin-top: 1.5rem !important;
+}
+
+[data-theme="light"] .contact-form-section .notice-text {
+  color: #071423 !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+[data-theme="light"] .contact-form-section .notice-highlight {
+  color: #0d7377 !important;
+  font-weight: 800 !important;
+  background: rgba(13, 115, 119, 0.08) !important;
+  padding: 0.2rem 0.5rem !important;
+  border-radius: 4px !important;
+}
+
+/* Form button styling in light mode */
+[data-theme="light"] .contact-form-section .form-actions {
+  margin-top: 1.5rem;
+}
+
+[data-theme="light"] .contact-form-section .btn.btn-primary {
+  background: linear-gradient(135deg, #0d7377, #0a5c5f) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  padding: 1.05rem 2.5rem !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(13, 115, 119, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+[data-theme="light"] .contact-form-section .btn.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 40px rgba(13, 115, 119, 0.3) !important;
+}
+
+[data-theme="light"] .contact-form-section .btn.btn-primary:active {
+  transform: translateY(0) !important;
+}
 
 /* Accessible focus-visible styles for form controls */
 .contact-form input:focus-visible,
@@ -984,6 +2388,12 @@ body{padding-top:70px}
   pointer-events:none;
 }
 
+/* Light mode enhanced top border shine effect */
+[data-theme="light"] .contact-form-section::before {
+  background: linear-gradient(90deg, transparent, rgba(13, 115, 119, 0.3), transparent) !important;
+  height: 2px !important;
+}
+
 .contact-form-section::after{
   content:'';
   position:absolute;
@@ -994,6 +2404,15 @@ body{padding-top:70px}
   background:radial-gradient(circle,rgba(6,182,212,0.1),transparent);
   border-radius:50%;
   pointer-events:none;
+}
+
+/* Light mode enhanced corner glow effect */
+[data-theme="light"] .contact-form-section::after {
+  background: radial-gradient(circle, rgba(13, 115, 119, 0.12), transparent) !important;
+  top: -60px !important;
+  right: -60px !important;
+  width: 200px !important;
+  height: 200px !important;
 }
 
 .contact-cards-container{
@@ -1014,7 +2433,7 @@ body{padding-top:70px}
   border-radius:18px;
   border:1.5px solid rgba(6,182,212,0.35);
   text-align:center;
-  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1), background 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
   cursor:default;
   box-shadow:0 8px 32px rgba(6,182,212,0.12);
   position:relative;
@@ -1024,6 +2443,34 @@ body{padding-top:70px}
   flex-shrink:0;
   width:240px;
   height:100%;
+}
+
+/* Unified small border-radius for card-like surfaces */
+/* Apply a consistent 5px radius across cards in the UI. Scoped broadly so all card types match. */
+.service-card,
+.portfolio-item,
+.contact-card,
+.contact-platforms-card,
+.hero-card .card-mock,
+.contact-form,
+.contact-form-section,
+.plan,
+.feature {
+  border-radius: 15px !important;
+}
+
+/* Light mode contact card */
+[data-theme="light"] .contact-card {
+  background: linear-gradient(135deg, rgba(11, 110, 253, 0.08), rgba(6, 182, 212, 0.06)) !important;
+  border: 1.5px solid rgba(11, 110, 253, 0.2) !important;
+  box-shadow: 0 6px 24px rgba(11, 110, 253, 0.08) !important;
+}
+
+[data-theme="light"] .contact-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 16px 48px rgba(11, 110, 253, 0.12) !important;
+  border-color: rgba(11, 110, 253, 0.35) !important;
+  background: linear-gradient(135deg, rgba(11, 110, 253, 0.12), rgba(6, 182, 212, 0.1)) !important;
 }
 
 .contact-card::before{
@@ -1064,10 +2511,15 @@ body{padding-top:70px}
 .contact-icon{
   font-size:2.8rem;
   margin-bottom:1rem;
-  transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  transition:transform 0.3s cubic-bezier(0.4,0,0.2,1), filter 0.6s ease;
   display:inline-block;
   line-height:1;
   filter:drop-shadow(0 4px 12px rgba(6,182,212,0.2));
+}
+
+/* Light mode contact icon */
+[data-theme="light"] .contact-icon {
+  filter: drop-shadow(0 2px 8px rgba(11, 110, 253, 0.12)) !important;
 }
 
 .contact-card:hover .contact-icon{
@@ -1081,6 +2533,12 @@ body{padding-top:70px}
   color:var(--card-heading);
   letter-spacing:-0.01em;
   line-height:1.3;
+  transition: color 0.6s ease;
+}
+
+/* Light mode contact heading */
+[data-theme="light"] .contact-card h3 {
+  color: var(--text) !important;
 }
 
 .contact-card h3::after{
@@ -1166,9 +2624,25 @@ body{padding-top:70px}
   color:var(--text-secondary);
   width:100%;
   max-width:100%;
+  transition: background 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+/* Light mode contact platforms card */
+[data-theme="light"] .contact-platforms-card {
+  background: linear-gradient(180deg, rgba(11, 110, 253, 0.05), rgba(6, 182, 212, 0.03)) !important;
+  border: 1px solid rgba(11, 110, 253, 0.15) !important;
+  box-shadow: 0 6px 20px rgba(11, 110, 253, 0.08) !important;
+  backdrop-filter: blur(6px) saturate(110%);
+  -webkit-backdrop-filter: blur(6px) saturate(110%);
 }
 
 /* subtle hover — keep it integrated but with lift */
+[data-theme="light"] .contact-platforms-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 40px rgba(11, 110, 253, 0.12) !important;
+  border-color: rgba(11, 110, 253, 0.25) !important;
+}
+
 .contact-platforms-card:hover{
   transform:translateY(-6px);
   box-shadow:0 18px 50px rgba(2,6,23,0.55);
@@ -1183,6 +2657,7 @@ body{padding-top:70px}
   letter-spacing:0.2px;
   text-transform:none;
   text-align:center;
+  transition: color 0.6s ease;
 }
 
 .contact-platforms-card .platform-label{
@@ -1194,6 +2669,12 @@ body{padding-top:70px}
   display:block;
   margin-bottom:0.5rem;
   text-align:center;
+  transition: color 0.6s ease;
+}
+
+/* Light mode platform label */
+[data-theme="light"] .contact-platforms-card .platform-label {
+  color: var(--muted) !important;
 }
 
 /* arrange buttons in a responsive grid so they look tidy */
@@ -1220,7 +2701,17 @@ body{padding-top:70px}
   font-weight:800;
   font-size:0.95rem;
   box-shadow:0 8px 20px rgba(0,0,0,0.22);
-  transition:transform 0.18s ease, box-shadow 0.18s ease;
+  transition:transform 0.18s ease, box-shadow 0.18s ease, background 0.6s ease;
+}
+
+/* Light mode platform buttons */
+[data-theme="light"] .contact-platforms-card .platform-btn {
+  box-shadow: 0 4px 12px rgba(11, 110, 253, 0.12) !important;
+}
+
+[data-theme="light"] .contact-platforms-card .platform-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(11, 110, 253, 0.15) !important;
 }
 
 .contact-platforms-card .platform-btn:hover{
@@ -1250,9 +2741,15 @@ body{padding-top:70px}
   border-radius:10px;
   font-weight:700;
   letter-spacing:0.5px;
-  text-transform:uppercase;
-  font-size:0.78rem;
+  transition: background 0.6s ease, color 0.6s ease;
 }
+
+/* Light mode contact sub text */
+[data-theme="light"] .contact-platforms-card .contact-sub {
+  background: rgba(11, 110, 253, 0.08) !important;
+  color: var(--text-secondary) !important;
+}
+
 .form-group{
   margin-bottom:1.35rem;
 }
@@ -1398,6 +2895,11 @@ body{padding-top:70px}
 .notice-highlight{
   color:#fff5d6 !important;
   font-weight:800;
+}
+
+/* Light-mode override: make the highlighted response time black for legibility on light backgrounds */
+[data-theme="light"] .notice-highlight{
+  color: #000 !important;
 }
 
 .contact-info-section{
@@ -1888,6 +3390,13 @@ body{padding-top:70px}
   margin-top:4rem;
   backdrop-filter:blur(10px);
   position:relative;
+  /* make footer full-bleed and ignore body padding/gutters */
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  box-sizing: border-box;
   overflow:hidden;
 }
 
@@ -1987,6 +3496,11 @@ body{padding-top:70px}
   border-radius:1px;
 }
 
+/* Light-mode override: make footer headings black for best contrast on light backgrounds */
+[data-theme="light"] .footer-heading{
+  color: #000 !important;
+}
+
 .footer-nav{
   display:flex;
   flex-direction:column;
@@ -2045,7 +3559,28 @@ body{padding-top:70px}
   transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
   cursor:pointer;
   position:relative;
-  overflow:hidden;
+  overflow:visible;
+}
+
+.footer-socials a::after{
+  content:attr(title);
+  position:absolute;
+  bottom:-40px;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg, #0d7377, #0a5c5f);
+  color:#ffffff;
+  padding:0.5rem 0.8rem;
+  border-radius:6px;
+  font-size:0.8rem;
+  font-weight:600;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.3s ease, transform 0.3s ease;
+  z-index:10;
+  box-shadow:0 6px 20px rgba(13, 115, 119, 0.25);
+  letter-spacing:0.3px;
 }
 
 .footer-socials a::before{
@@ -2072,6 +3607,11 @@ body{padding-top:70px}
   opacity:1;
 }
 
+.footer-socials a:hover::after{
+  opacity:1;
+  transform:translateX(-50%) translateY(-12px);
+}
+
 .footer-social-logo{
   height:100%;
   width:auto;
@@ -2080,6 +3620,23 @@ body{padding-top:70px}
   display:block;
   position:relative;
   z-index:1;
+}
+
+/* Light mode footer social links styling */
+[data-theme="light"] .footer-socials a{
+  background:linear-gradient(135deg, rgba(13, 115, 119, 0.1), rgba(6, 182, 212, 0.08)) !important;
+  border:2px solid rgba(13, 115, 119, 0.2) !important;
+}
+
+[data-theme="light"] .footer-socials a::after{
+  background:linear-gradient(135deg, #0d7377, #0a5c5f) !important;
+  box-shadow:0 6px 20px rgba(13, 115, 119, 0.25) !important;
+}
+
+[data-theme="light"] .footer-socials a:hover{
+  background:linear-gradient(135deg, #0d7377, #0a5c5f) !important;
+  border-color:#0a5c5f !important;
+  box-shadow:0 12px 30px rgba(13, 115, 119, 0.3) !important;
 }
 
 .linkedin-social{
@@ -2151,6 +3708,18 @@ body{padding-top:70px}
   
   .site-footer{
     padding:3rem 0 2rem;
+  }
+}
+
+/* Mobile padding for footer-bottom on smaller screens (200px - 900px) */
+@media (min-width:200px) and (max-width:900px){
+  .footer-bottom{
+    padding-left:1.5rem;
+    padding-right:1.5rem;
+  }
+  
+  .footer-bottom p{
+    padding:0 0.5rem;
   }
 }
 
@@ -2338,7 +3907,7 @@ html{scroll-behavior:smooth}
     transform:scale(0.8) translateY(-30px);
     opacity:0;
   }
-  to{
+  body{
     transform:scale(1) translateY(0);
     opacity:1;
   }
@@ -2346,7 +3915,7 @@ html{scroll-behavior:smooth}
 
 .success-icon{
   width:60px;
-  height:60px;
+    transition: background 0.4s ease, color 0.4s ease;
   background:linear-gradient(135deg,#10b981,#06b6d4);
   border-radius:50%;
   display:flex;
@@ -2402,5 +3971,64 @@ html{scroll-behavior:smooth}
 
 .popup-close:active{
   transform:translateY(0);
+}
+
+/* Bright/light-mode variant for the Contact section wrapper */
+[data-theme="light"] .contact-wrapper.va-white{
+  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%) !important;
+  color:#071423 !important;
+  border:1px solid rgba(7,20,35,0.06) !important;
+  box-shadow:0 12px 48px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(13,115,119,0.1) !important;
+  position:relative;
+  z-index:30; /* lift above surrounding surface */
+  transform:translateZ(0);
+  filter:brightness(1.02);
+  border-radius:20px;
+  padding:1.6rem;
+  overflow: visible; /* allow glow */
+}
+
+[data-theme="light"] .contact-wrapper.va-white::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+  mix-blend-mode: normal;
+  box-shadow: 0 6px 30px rgba(255,255,255,0.45) inset;
+  opacity: 1;
+}
+
+[data-theme="light"] .contact-wrapper.va-white::after{
+  content: '';
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  bottom: -18px;
+  height: 72px;
+  filter: blur(18px);
+  background: radial-gradient(closest-side, rgba(13,115,119,0.06), transparent);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Let inner form and small contact cards sit visually on the white wrapper by removing their colored surfaces */
+[data-theme="light"] .contact-wrapper.va-white .contact-form-section,
+[data-theme="light"] .contact-wrapper.va-white .contact-card,
+[data-theme="light"] .contact-wrapper.va-white .contact-platforms-card{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+[data-theme="light"] .contact-wrapper.va-white .contact-form{
+  background: transparent !important;
+}
+
+[data-theme="light"] .contact-wrapper.va-white:focus-within{
+  box-shadow:0 22px 60px rgba(2,6,23,0.12) !important;
+  outline:3px solid rgba(13,115,119,0.06) !important;
 }
 

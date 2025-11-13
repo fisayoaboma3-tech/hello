@@ -6,7 +6,257 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Force dark theme only (site is dark-mode only)
   const html = document.documentElement;
-  html.setAttribute('data-theme', 'dark');
+
+  // THEME: initialize from localStorage, then default to dark to ensure
+  // the site loads in dark mode first (avoids a flash of light theme).
+  // saved preference still wins when present.
+  const savedTheme = localStorage.getItem('theme');
+  const initialTheme = savedTheme || 'dark';
+  html.setAttribute('data-theme', initialTheme);
+
+  // Contrast helper: When in light mode, find very-light text and add a subtle dark background
+  function adjustContrastForLightMode(theme){
+    // selectors to check (inline highlights, tags, badges, platform buttons, etc.)
+    const selectors = [
+      '.highlight-text', '.fast-response', '.tag', '.platform-btn', '.platform-buttons a', '.brand-name', '.header-title', '.portfolio-item .portfolio-icon', '.section-title', '.notice-highlight', '.profile-caption'
+    ];
+
+    // Remove any previously applied class first
+    document.querySelectorAll('.needs-dark-bg').forEach(el => el.classList.remove('needs-dark-bg'));
+
+    if(theme !== 'light') return; // only apply in light mode
+
+    function parseRgb(colorStr){
+      if(!colorStr) return null;
+      const rgb = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+      if(rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+      // hex fallback
+      const hex = colorStr.trim();
+      if(hex[0] === '#'){
+        let h = hex.slice(1);
+        if(h.length === 3) h = h.split('').map(c => c + c).join('');
+        if(h.length === 6){
+          return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+        }
+      }
+      return null;
+    }
+
+    function luminanceFromRgb([r,g,b]){
+      const srgb = [r,g,b].map(v => v/255).map(c => c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4));
+      return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+    }
+
+    const nodes = document.querySelectorAll(selectors.join(','));
+    nodes.forEach(el => {
+      try{
+        const cs = window.getComputedStyle(el);
+        const rgb = parseRgb(cs.color);
+        if(!rgb) return;
+        const lum = luminanceFromRgb(rgb);
+        // if text is very light (close to white), give it a subtle dark pill background for legibility
+        if(lum > 0.85){
+          el.classList.add('needs-dark-bg');
+        }
+      }catch(err){/* ignore */}
+    });
+  }
+
+  // Run non-critical tasks during idle to avoid blocking first paint
+  function runWhenIdle(fn, timeout = 250){
+    if('requestIdleCallback' in window){
+      try{ requestIdleCallback(fn, { timeout }); return; }catch(e){}
+    }
+    // fallback
+    setTimeout(fn, timeout);
+  }
+
+  // Theme toggle wiring
+  const themeToggle = document.getElementById('theme-toggle');
+  // Inline SVGs for a slightly more 'futuristic' sun and a simple crescent moon.
+  // We inject SVG markup (using currentColor) so it matches surrounding text color and scales crisply.
+  const SUN_SVG = `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3.2" fill="currentColor" fill-opacity="0.14" />
+        <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+        <path d="M12 2v2" />
+        <path d="M12 20v2" />
+        <path d="M4.93 4.93l1.41 1.41" />
+        <path d="M17.66 17.66l1.41 1.41" />
+        <path d="M2 12h2" />
+        <path d="M20 12h2" />
+        <path d="M4.93 19.07l1.41-1.41" />
+        <path d="M17.66 6.34l1.41-1.41" />
+      </g>
+    </svg>`;
+
+  const MOON_SVG = `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor" opacity="0.98"/>
+    </svg>`;
+  function applyTheme(t){
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    if(themeToggle){
+      const isDark = t === 'dark';
+      themeToggle.setAttribute('aria-pressed', String(isDark));
+      const icon = themeToggle.querySelector('.theme-icon');
+      // Inject inline SVG so the icon looks crisp and 'futuristic' rather than an emoji.
+      if(icon) icon.innerHTML = isDark ? MOON_SVG : SUN_SVG;
+      themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    adjustContrastForLightMode(t);
+    updateProfileImage(t);
+  }
+
+    if(themeToggle){
+    // set initial toggle state
+    const isDarkInit = initialTheme === 'dark';
+    themeToggle.setAttribute('aria-pressed', String(isDarkInit));
+    const iconInit = themeToggle.querySelector('.theme-icon');
+    if(iconInit) iconInit.innerHTML = isDarkInit ? MOON_SVG : SUN_SVG;
+    themeToggle.addEventListener('click', function(){
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+
+      // Create or reuse a full-viewport overlay to smoothly hide flicker during theme swap.
+      let overlay = document.querySelector('.theme-transition-overlay');
+      if(!overlay){
+        overlay = document.createElement('div');
+        overlay.className = 'theme-transition-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      // Pick overlay color based on direction so the fade feels natural
+      if(next === 'light'){
+        // fade to white then reveal light theme
+        overlay.style.backgroundColor = 'rgba(255,255,255,0.94)';
+      } else {
+        // fade to near-black then reveal dark theme
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.92)';
+      }
+
+      // Start theme-transition class to scope element transitions
+      try{
+        html.classList.add('theme-transition');
+        window.setTimeout(() => html.classList.remove('theme-transition'), 900);
+      }catch(err){ /* ignore */ }
+
+      // Fade overlay in, swap theme when overlay is opaque, then fade out and remove
+      overlay.classList.add('active');
+
+      // Wait for overlay fade-in (CSS 350ms) before applying theme to avoid flash
+      setTimeout(() => {
+        applyTheme(next);
+
+        // give the theme a moment to apply (paint) then fade the overlay out
+        setTimeout(() => {
+          overlay.classList.remove('active');
+          // remove overlay from DOM after fade-out completes
+          setTimeout(() => {
+            try{ overlay.remove(); }catch(e){}
+          }, 420);
+        }, 160);
+      }, 260);
+    });
+  }
+
+  // Defer heavy contrast checks until the browser is idle so first paint isn't delayed
+  runWhenIdle(() => adjustContrastForLightMode(initialTheme));
+
+  // --- Dynamic profile image switching based on theme ---
+  function updateProfileImage(theme){
+    const profileImg = document.querySelector('.hero-profile img');
+    if(!profileImg) return;
+    
+    // Fade out
+    profileImg.style.opacity = '0';
+    
+    // Change image after fade starts
+    setTimeout(() => {
+      if(theme === 'light'){
+        // Use white/light version in light mode
+        profileImg.src = 'images/ceowhite.jpg';
+        profileImg.alt = 'Profile portrait';
+      } else {
+        // Use original image in dark mode
+        profileImg.src = 'images/ceo.jpg';
+        profileImg.alt = 'Profile portrait';
+      }
+      
+      // Fade in
+      profileImg.style.opacity = '1';
+    }, 250);
+  }
+
+  // Update profile image on initial load (no animation on first load)
+  const profileImg = document.querySelector('.hero-profile img');
+  if(profileImg) {
+    profileImg.style.opacity = '1';
+    if(initialTheme === 'light'){
+      profileImg.src = 'images/ceowhite.jpg';
+    } else {
+      profileImg.src = 'images/ceo.jpg';
+    }
+  }
+
+  // --- Dynamic blue gradient blobs for background (light mode) ---
+  function randomInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+  // darker blue palettes for stronger visual impact
+  const bluePalettes = [
+    ['#053a8b', '#0b63d9', '#0369a1'],
+    ['#023f8a', '#0b4fd6', '#0ea5e9'],
+    ['#042f6b', '#075aa8', '#0ea5e9']
+  ];
+
+  // Build radial gradients. Positions are computed from a random angle (degrees)
+  // which is converted to x/y offsets around center — this gives control via degrees
+  // Also adds a black vignette on left/right sides
+  function buildRadials(){
+    const parts = [];
+    const palette = pick(bluePalettes);
+    const count = randomInt(2,4);
+    for(let i=0;i<count;i++){
+      const color = palette[i % palette.length];
+      const size = randomInt(28,56); // percent size
+      // pick an angle in degrees and a radius offset (how far from center)
+      const angleDeg = randomInt(0,359);
+      const angleRad = angleDeg * (Math.PI/180);
+      const radiusOffset = randomInt(10,40); // percent offset from center
+      // compute x/y around center (50% is center)
+      const x = 50 + Math.cos(angleRad) * radiusOffset;
+      const y = 50 + Math.sin(angleRad) * radiusOffset;
+      // darker, slightly stronger alpha for deeper blues
+      const alpha = (Math.random() * 0.22 + 0.12).toFixed(3);
+      parts.push(`radial-gradient(circle at ${x.toFixed(1)}% ${y.toFixed(1)}%, ${hexToRgba(color, alpha)} ${size}%, transparent 65%)`);
+    }
+    // Add black vignette gradients on left and right sides
+    parts.push('linear-gradient(90deg, #000000 0%, transparent 15%, transparent 85%, #000000 100%)');
+    return parts.join(', ');
+  }
+
+  function hexToRgba(hex, a){
+    const h = hex.replace('#','');
+    const bigint = parseInt(h.length===3? h.split('').map(c=>c+c).join('') : h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+
+  function applyRandomBackground(){
+    const htmlEl = document.documentElement;
+    // Background gradients disabled - always clear radials
+    htmlEl.style.removeProperty('--bg-radials');
+  }
+
+  // Run once on load and again periodically for subtle variation
+  applyRandomBackground();
+  // refresh every 18-28 seconds
+  setInterval(applyRandomBackground, randomInt(18000, 28000));
 
   // Disable double-tap zoom for app-like feel on mobile
   let lastTouchEnd = 0;
@@ -28,14 +278,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const ctaButtons = document.querySelectorAll('.cta-row .btn');
   
   // Add hover pulse effect to CTA buttons
-  ctaButtons.forEach(btn => {
-    btn.addEventListener('mouseenter', function() {
-      this.style.transform = 'scale(1.05)';
-    });
-    btn.addEventListener('mouseleave', function() {
-      this.style.transform = 'scale(1)';
-    });
-  });
+  // Use CSS for hover effects (removing inline JS transforms avoids layout thrash and is much cheaper).
+  // If you want JS-driven micro-interactions later, prefer toggling a class and scheduling via rAF.
 
   // Smooth scroll to section functionality
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -94,32 +338,39 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
-  // Active nav link by scroll position
-  const sections = Array.from(document.querySelectorAll('[id="home"], [id="about"], main section[id]'));
+  // Active nav link using IntersectionObserver (far cheaper than measuring offsets on every scroll)
+  const sections = Array.from(document.querySelectorAll('main section[id], #home, #about'));
   const navLinks = Array.from(document.querySelectorAll('#primary-nav a'));
 
-  function onScroll(){
-    const scrollPos = window.scrollY + 100;
-    let current = sections[0];
-    for(const sec of sections){
-      if(sec.offsetTop <= scrollPos) current = sec;
-    }
-    const id = current.id;
-    navLinks.forEach(a => {
-      const isActive = a.getAttribute('href') === ('#'+id);
-      a.classList.toggle('active', isActive);
+  function setActiveLinkById(id){
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === ('#' + id)));
+  }
+
+  function observeSectionsForNav(){
+    const header = document.querySelector('.site-header');
+    const headerHeight = header ? header.offsetHeight : 70;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          const id = entry.target.id;
+          if(id) setActiveLinkById(id);
+        }
+      });
+    }, { root: null, rootMargin: `-${headerHeight}px 0px -40% 0px`, threshold: [0.25, 0.5, 0.75] });
+
+    sections.forEach(sec => {
+      try{ io.observe(sec); }catch(e){/* ignore */}
     });
   }
-  window.addEventListener('scroll', throttle(onScroll, 100));
-  onScroll();
-  
-  // Update active link immediately when clicking a nav link
+
+  observeSectionsForNav();
+
+  // Give instant feedback when clicking nav links (so the user sees the link active immediately)
   navLinks.forEach(link => {
     link.addEventListener('click', function(){
-      setTimeout(() => {
-        onScroll();
-      }, 800);
-    });
+      navLinks.forEach(a => a.classList.remove('active'));
+      this.classList.add('active');
+    }, { passive: true });
   });
 
   // Simple throttle
@@ -423,5 +674,52 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 
-// Small helper if needed elsewhere
-function $(sel){return document.querySelector(sel)}
+
+  // Mail icon behavior: on mobile rewrite the anchor to a mailto and remove target so
+  // the native mail app opens. On desktop, attach a click handler that attempts to
+  // open Gmail compose in a new tab and falls back to mailto if blocked.
+  (function(){
+    const links = document.querySelectorAll('a.gmail-link');
+    if(!links || !links.length) return;
+
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if(isMobile){
+      // For mobile devices, ensure the anchor uses a mailto: href so the
+      // native mail client is used. Also remove target/rel to avoid opening
+      // the Gmail web interface in a new tab.
+      links.forEach(link => {
+        const to = link.dataset.email || (link.getAttribute('href')||'').replace(/^mailto:/i,'');
+        if(!to) return;
+        link.setAttribute('href', `mailto:${to}`);
+        link.removeAttribute('target');
+        link.removeAttribute('rel');
+      });
+      return;
+    }
+
+    // Desktop: attach handler to open Gmail compose in a new tab, falling back to mailto
+    links.forEach(link => {
+      link.addEventListener('click', function(e){
+        // Allow user to use native ctrl/cmd+click or middle-click to open directly
+        if(e.metaKey || e.ctrlKey || e.button === 1) return;
+
+        e.preventDefault();
+        const to = this.dataset.email || (this.getAttribute('href')||'').replace(/^mailto:/i,'');
+        if(!to) return;
+
+        const subject = '';
+        const body = '';
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        // Try opening Gmail in a new tab/window. If blocked, fallback to mailto navigation.
+        let opened = null;
+        try{ opened = window.open(gmailUrl, '_blank'); }catch(err){ opened = null; }
+        if(!opened){
+          // popup blocked or failed — navigate to mailto as fallback
+          window.location.href = `mailto:${to}`;
+        }
+      });
+    });
+  })();
+

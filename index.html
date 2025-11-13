@@ -5,16 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="description" content="ENOCHDESK: Web Development, SEO Optimization, and AI-Powered Virtual Assistant. Helping entrepreneurs scale their business with efficiency and intelligence.">
   <title>ENOCHDESK — Web Developer, SEO Specialist & Virtual Assistant</title>
+  <!-- Immediately set dark theme to avoid a flash of light theme on first paint -->
+  <script>/* set dark theme synchronously before styles load */(function(){try{document.documentElement.setAttribute('data-theme','dark')}catch(e){}})();</script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1349 1349'%3E%3Crect fill='%23000' width='1349' height='1349'/%3E%3Cpath fill='%23fff' d='M280 290Q280 180 370 110Q460 40 560 40Q660 40 750 110Q840 180 840 290L840 860Q840 970 750 1040Q660 1110 560 1110Q460 1110 370 1040Q280 970 280 860V290Z'/%3E%3Cpath fill='%23000' d='M560 400L750 400L750 500L560 500V400M560 600L750 600L750 700L560 700V600'/%3E%3Cpath fill='%23fff' d='M1040 290Q1040 180 950 110Q860 40 760 40Q660 40 750 110Q840 180 840 290L840 860Q840 970 950 1040Q1040 1110 1140 1110Q1240 1110 1150 1040Q1060 970 1060 860V290Z'/%3E%3Cpath fill='%23000' d='M850 400L1040 400L1040 500L850 500V400M850 600L1040 600L1040 700L850 700V600'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="css/styles.css">
+  <!-- Load main styles non-blocking: preload then swap to stylesheet on load. noscript fallback for users with JS disabled -->
+  <link rel="preload" href="css/styles.css" as="style" onload="this.rel='stylesheet'">
+  <link rel="preload" href="css/desktop-contact.css" as="style" onload="this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/desktop-contact.css">
+  </noscript>
 </head>
 <body>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="#home" aria-label="VA home">
-        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo">
+        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo" loading="lazy" decoding="async">
         <span class="brand-name"><span class="brand-enoch">ENOCH</span><span class="brand-desk">DESK</span></span>
       </a>
+
+      <!-- Theme toggle (light / dark) -->
+      <button id="theme-toggle" class="theme-toggle" aria-pressed="false" aria-label="Toggle color theme">
+        <span class="sr-only">Toggle color theme</span>
+        <span class="theme-icon" aria-hidden="true"></span>
+      </button>
 
       <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation">
         <span class="sr-only">Toggle navigation</span>
@@ -42,19 +57,19 @@
   <main>
     <section id="home" class="hero">
       <div class="container hero-inner">
-        <div class="hero-copy">
+       <div class="hero-copy"> 
           <h1>Hi, I'm Enoch <span class="wave-emoji">👋🏾</span></h1>
           <p class="hero-subtitle">Web Developer | SEO Specialist | AI-Powered Virtual Assistant <span class="fast-response">⚡ Fast Response</span></p>
           <p class="lead">I help entrepreneurs and small businesses grow online. I build stunning, SEO-optimized websites and provide comprehensive virtual assistance powered by AI. From email management to scheduling, data analysis, and workflow automation — I handle it all. <span class="highlight-text">⚡ Available for quick project discussions</span> More visibility. Better systems. Real growth.</p>
           <p class="cta-row">
-            <a class="btn btn-primary" href="#contact">Hire Me</a>
+            <a class="btn btn-primary hire-me" href="#contact">Hire Me</a>
             <a class="btn btn-ghost" href="#services">See My Services</a>
           </p>
         </div>
 
         <!-- Profile image area: replace the SVG file with your attached image (e.g. images/your-photo.jpg) -->
         <aside class="hero-profile" aria-label="Profile">
-          <img src="images/ceo.jpg" alt="Profile portrait" class="profile-img">
+          <img src="images/ceo.jpg" alt="Profile portrait" class="profile-img" loading="lazy" decoding="async">
           <p class="profile-caption">Enoch Chukwudi — Founder</p>
         </aside>
 
@@ -122,46 +137,46 @@
 
         <div class="services-grid">
 
-             <div class="service-card">
+             <div class="service-card va-white">
             <div class="service-header">
               <span class="service-icon">⚙️</span>
               <h3>Virtual Assistance (AI-Powered)</h3>
             </div>
             <p>Full-spectrum a General virtual assistant services enhanced with AI. Email management, scheduling, data analysis, customer support, research, and administrative tasks streamlined and automated.</p>
             <div class="service-tags">
-              <span class="tag">Email Management</span>
-              <span class="tag">Scheduling</span>
-              <span class="tag">Data Analysis</span>
-              <span class="tag">AI Automation</span>
-              <span class="tag">Calendar & Planning</span>
-              <span class="tag">Data Entry</span>
-              <span class="tag">Content & Management</span>
+              <span class="tag highlight">Email Management</span>
+              <span class="tag highlight">Scheduling</span>
+              <span class="tag highlight">Data Analysis</span>
+              <span class="tag highlight">AI Automation</span>
+              <span class="tag highlight">Calendar & Planning</span>
+              <span class="tag highlight">Data Entry</span>
+              <span class="tag highlight">Content & Management</span>
             </div>
           </div>
 
-          <div class="service-card">
+          <div class="service-card va-white">
             <div class="service-header">
               <span class="service-icon">💻</span>
               <h3>Web Development</h3>
             </div>
             <p>Custom websites and web applications built with modern technologies. Responsive design, fast performance, and user-focused interfaces.</p>
             <div class="service-tags">
-              <span class="tag">HTML/CSS</span>
-              <span class="tag">JavaScript</span>
-              <span class="tag">React</span>
+              <span class="tag highlight">HTML/CSS</span>
+              <span class="tag highlight">JavaScript</span>
+              <span class="tag highlight">React</span>
             </div>
           </div>
 
-          <div class="service-card">
+          <div class="service-card va-white">
             <div class="service-header">
               <span class="service-icon">🔍</span>
               <h3>SEO Optimization</h3>
             </div>
             <p>Boost your online visibility with proven SEO strategies. Technical optimization, content strategy, and keyword research for better rankings.</p>
             <div class="service-tags">
-              <span class="tag">On-page SEO</span>
-              <span class="tag">Technical SEO</span>
-              <span class="tag">Analytics</span>
+              <span class="tag highlight">On-page SEO</span>
+              <span class="tag highlight">Technical SEO</span>
+              <span class="tag highlight">Analytics</span>
             </div>
           </div>
 
@@ -184,7 +199,7 @@
 
           <div class="portfolio-carousel">
             <div class="portfolio-grid">
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #0b6efd, #0ea5e9);">
                   <span class="portfolio-icon">💻</span>
                 </div>
@@ -193,7 +208,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item featured">
+              <div class="portfolio-item featured va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #fbbf24, #fcd34d);">
                   <span class="portfolio-icon">🔍</span>
                 </div>
@@ -202,7 +217,7 @@
                 <a class="btn btn-primary" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #10b981, #34d399);">
                   <span class="portfolio-icon">⚙️</span>
                 </div>
@@ -211,7 +226,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
                   <span class="portfolio-icon">📋</span>
                 </div>
@@ -220,7 +235,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #ec4899, #f472b6);">
                   <span class="portfolio-icon">☁️</span>
                 </div>
@@ -229,7 +244,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
                   <span class="portfolio-icon">📊</span>
                 </div>
@@ -238,7 +253,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">
                   <span class="portfolio-icon">✉️</span>
                 </div>
@@ -247,7 +262,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #dc2626, #ef4444);">
                   <span class="portfolio-icon">📱</span>
                 </div>
@@ -256,7 +271,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">
                   <span class="portfolio-icon">🎯</span>
                 </div>
@@ -265,7 +280,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #059669, #10b981);">
                   <span class="portfolio-icon">📅</span>
                 </div>
@@ -274,7 +289,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #e11d48, #f43f5e);">
                   <span class="portfolio-icon">🛒</span>
                 </div>
@@ -283,7 +298,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #0891b2, #06b6d4);">
                   <span class="portfolio-icon">📈</span>
                 </div>
@@ -292,7 +307,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #b91c1c, #dc2626);">
                   <span class="portfolio-icon">🌐</span>
                 </div>
@@ -301,7 +316,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #16a34a, #22c55e);">
                   <span class="portfolio-icon">💬</span>
                 </div>
@@ -310,7 +325,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item featured">
+              <div class="portfolio-item featured va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #d946ef, #ec4899);">
                   <span class="portfolio-icon">🚀</span>
                 </div>
@@ -319,7 +334,7 @@
                 <a class="btn btn-primary" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #ea580c, #f97316);">
                   <span class="portfolio-icon">🎨</span>
                 </div>
@@ -328,7 +343,7 @@
                 <a class="btn btn-ghost" href="#contact">View Project</a>
               </div>
 
-              <div class="portfolio-item">
+              <div class="portfolio-item va-white">
                 <div class="portfolio-image" style="background: linear-gradient(135deg, #0369a1, #0284c7);">
                   <span class="portfolio-icon">🔐</span>
                 </div>
@@ -353,7 +368,7 @@
         <h2 class="section-title">Get In Touch</h2>
         <p class="section-sub">Ready to grow your business? Let's connect and discuss how I can help.</p>
 
-        <div class="contact-wrapper">
+  <div class="contact-wrapper va-white">
           <div class="contact-left-section">
 
             <div class="contact-form-section">
@@ -394,7 +409,7 @@
 
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary">Send Message</button>
-                  <p id="form-status" class="form-status" aria-live="polite"></p>
+                 
                 </div>
 
                 <div class="form-notice" role="status" aria-live="polite">
@@ -411,19 +426,19 @@
               <span class="platform-label">Connect with me on</span>
               <div class="platform-buttons">
                 <a href="https://fiverr.com" class="platform-btn fiverr-btn" title="Fiverr - Verified Freelancer" target="_blank" rel="noopener noreferrer">
-                  <img src="images/fiverr.png" alt="Fiverr" class="platform-logo">
+                  <img src="images/fiverr.png" alt="Fiverr" class="platform-logo" loading="lazy" decoding="async">
                 </a>
                 <a href="https://upwork.com" class="platform-btn upwork-btn" title="Upwork - Top Rated Plus" target="_blank" rel="noopener noreferrer">
-                  <img src="images/upwork.png" alt="Upwork" class="platform-logo">
+                  <img src="images/upwork.png" alt="Upwork" class="platform-logo" loading="lazy" decoding="async">
                 </a>
                 <a href="https://freelancer.com" class="platform-btn freelancer-btn" title="Freelancer - Certified Member" target="_blank" rel="noopener noreferrer">
-                  <img src="images/freelancer.png" alt="Freelancer" class="platform-logo">
+                  <img src="images/freelancer.png" alt="Freelancer" class="platform-logo" loading="lazy" decoding="async">
                 </a>
                 <a href="https://www.peopleperhour.com" class="platform-btn pph-btn" title="PeoplePerHour - Vetted Expert" target="_blank" rel="noopener noreferrer">
-                  <img src="images/peopleperhour.png" alt="PeoplePerHour" class="platform-logo">
+                  <img src="images/peopleperhour.png" alt="PeoplePerHour" class="platform-logo" loading="lazy" decoding="async">
                 </a>
                 <a href="https://www.toptal.com" class="platform-btn toptal-btn" title="Toptal - Exclusive Talent" target="_blank" rel="noopener noreferrer">
-                  <img src="images/toptal.png" alt="Toptal" class="platform-logo">
+                  <img src="images/toptal.png" alt="Toptal" class="platform-logo" loading="lazy" decoding="async">
                 </a>
               </div>
               <span class="contact-sub">All Profiles Verified & Active</span>
@@ -440,7 +455,7 @@
     <div class="container footer-content">
       <div class="footer-section">
          <a class="brand" href="#home" aria-label="VA home">
-        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo">
+        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo" loading="lazy" decoding="async">
         <span class="brand-name"><span class="brand-enoch">ENOCH</span><span class="brand-desk">DESK</span></span>
       </a>
         <p class="footer-desc">Web Developer | SEO Specialist | AI-Powered Virtual Assistant</p>
@@ -471,12 +486,13 @@
       <div class="footer-section">
         <h4 class="footer-heading">Connect</h4>
         <div class="footer-socials">
-          <a href="mailto:enochdesk@gmail.com" title="Email" aria-label="Email">📧</a>
+          <!-- Opens Gmail compose in a new tab (direct link to Gmail). `data-email` retained for scripts/fallbacks -->
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=chukwudi.enoch.work%40gmail.com" title="Email" aria-label="Email" class="gmail-link" data-email="chukwudi.enoch.work@gmail.com" target="_blank" rel="noopener noreferrer">📧</a>
           <a href="https://wa.me/2349162919586" title="WhatsApp" aria-label="WhatsApp" class="whatsapp-social">
-            <img src="images/whatsapp.png" alt="WhatsApp" class="footer-social-logo">
+            <img src="images/whatsapp.png" alt="WhatsApp" class="footer-social-logo" loading="lazy" decoding="async">
           </a>
           <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn" class="linkedin-social">
-            <img src="images/linkedin2.png" alt="LinkedIn" class="footer-social-logo">
+            <img src="images/linkedin2.png" alt="LinkedIn" class="footer-social-logo" loading="lazy" decoding="async">
           </a>
          
         </div>
@@ -485,7 +501,7 @@
 
     <div class="footer-bottom">
       <p>&copy; <span id="year"></span> ENOCHDESK — Simple & Trustworthy. All rights reserved.</p>
-      <p class="footer-credit">Crafted with <span class="heart">❤️</span> for your success</p>
+      <p class="footer-credit">Powered by VooltOS</p>
     </div>
   </footer>
 
