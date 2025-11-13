@@ -31,6 +31,8 @@ body{
   line-height:1.45;
   transition:background 0.4s ease, color 0.4s ease;
   will-change:scroll-position;
+  /* add breathing room at the bottom of the page so footer isn't flush to the viewport edge */
+  padding-bottom: 30px;
 }
 
 /* Smooth theme transition for all elements */
@@ -397,6 +399,11 @@ body {
 }
 
 [data-theme="light"] .notice-text{ color:var(--text-secondary) }
+
+/* Space after the footer content, specifically after the "Powered by VooltOS" line */
+.footer-bottom{
+  padding-bottom: 40px !important;
+}
 
 /* Prevent horizontal overflow when in light mode (fixes full-bleed elements causing scroll) */
 [data-theme="light"] html,
@@ -1574,6 +1581,27 @@ body{padding-top:70px}
 
   .contact-card {
     width: 100%;
+  }
+}
+
+/* Fix: prevent horizontal overflow in light mode for small screens (200px-900px)
+   The full-bleed carousel wrapper uses viewport-based negative margins on desktop
+   which can cause horizontal scroll on narrow viewports when combined with body padding.
+   Here we revert that behavior in light mode so the page doesn't scroll horizontally. */
+@media (max-width:900px){
+  [data-theme="light"] .portfolio-carousel-wrapper{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: auto !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    overflow: visible !important;
+  }
+
+  [data-theme="light"] .portfolio-carousel{
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    scroll-padding-inline: calc((100vw - 58vw) / 2);
   }
 }
 .section-title{margin:0 0 .25rem;font-size:1.25rem}
