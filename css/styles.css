@@ -398,6 +398,16 @@ body {
 
 [data-theme="light"] .notice-text{ color:var(--text-secondary) }
 
+/* Prevent horizontal overflow when in light mode (fixes full-bleed elements causing scroll) */
+[data-theme="light"] html,
+[data-theme="light"] body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  /* Ensure full-bleed elements using 100vw don't cause horizontal scroll due to body padding */
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 /* Stronger contrast overrides for key hero and CTA elements in light mode */
 [data-theme="light"] .hero-copy h1{
