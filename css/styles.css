@@ -818,10 +818,31 @@ body {
   box-shadow: 0 2px 20px rgba(0,0,0,0.3);
   width: 100%;
   padding: 0.5rem 0 0 1rem;
+  /* default horizontal padding (logical properties keep this consistent with layout variables) */
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
   will-change: transform;
   transform: translateZ(0);
 }
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
+
+/* Orientation-specific horizontal padding for the header
+   - portrait: comfortable narrow padding for tall viewports (phones held vertically)
+   - landscape: slightly larger horizontal padding to avoid edge-crowding on wide viewports
+   Uses the existing --container-pad variable to remain consistent with the site container spacing. */
+
+
+@media (orientation: landscape) {
+  .site-header{
+    /* slightly increase horizontal padding in landscape so content doesn't touch the edges */
+    padding-left: calc(var(--container-pad, 1.25rem) * 1.5);
+    padding-right: calc(var(--container-pad, 1.25rem) * 1.5);
+  }
+  .header-inner{
+    padding-left: 0.5rem;
+    padding-right: 1.5rem;
+  }
+}
 .brand{display:flex;align-items:center;gap:0.75rem;text-decoration:none;color:inherit;transition:all 0.3s ease;will-change:transform}
 .brand:hover{opacity:0.85;transform:scale(1.02)}
 .brand-logo{width:36px;height:36px;object-fit:contain;transition:all 0.3s ease;filter:drop-shadow(0 0 8px rgba(13,115,119,0.4));will-change:filter}
@@ -4096,5 +4117,339 @@ html{scroll-behavior:smooth}
 [data-theme="light"] .contact-wrapper.va-white:focus-within{
   box-shadow:0 22px 60px rgba(2,6,23,0.12) !important;
   outline:3px solid rgba(13,115,119,0.06) !important;
+}
+
+/* ===== LANDSCAPE ORIENTATION FOR MOBILE DEVICES (iPhone 6-14) ===== */
+/* When device is tilted to landscape, scale down content to look like desktop view */
+@media (max-width: 900px) and (orientation: landscape) {
+  /* Reduce padding and spacing for landscape orientation */
+  body {
+    padding-top: 60px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 20px;
+  }
+
+  /* Adjust header height and padding in landscape */
+  .site-header {
+    /* maintain a slightly reduced top padding but use container-based horizontal padding
+       so header spacing is consistent with the rest of the layout on devices like
+       iPhone 12 in landscape (width ~844px) */
+    padding-top: 0.3rem;
+    padding-bottom: 0;
+    padding-left: calc(var(--container-pad, 1.25rem) * 1.1);
+    padding-right: calc(var(--container-pad, 1.25rem) * 1.1);
+  }
+
+  .header-inner {
+    padding: 0.6rem 0;
+  }
+
+  /* Scale down brand logo and name */
+  .brand-logo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-name {
+    font-size: 0.9rem;
+  }
+
+  .brand-enoch,
+  .brand-desk {
+    padding: 0.1rem 0.2rem;
+  }
+
+  /* Reduce hero section padding and spacing */
+  .hero {
+    padding: 2rem 0;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr 280px;
+    gap: 1.2rem;
+  }
+
+  /* Reduce hero copy font sizes */
+  .hero-copy h1 {
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(0.85rem, 2.2vw, 1rem);
+    margin-bottom: 0.8rem;
+  }
+
+  .lead {
+    font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Scale down CTA buttons */
+  .cta-row {
+    gap: 0.6rem;
+  }
+
+  .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  /* Scale down profile image */
+  .profile-img {
+    max-width: 140px;
+    height: auto;
+  }
+
+  .profile-caption {
+    font-size: 0.7rem;
+    margin-top: 0.3rem;
+  }
+
+  /* Reduce mock card spacing */
+  .hero-card {
+    margin-top: -1rem;
+  }
+
+  .hero-card .card-mock {
+    padding: 0.9rem;
+  }
+
+  .mock-header {
+    gap: 0.55rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .header-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-title {
+    font-size: 1rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.8rem;
+  }
+
+  /* Reduce service card spacing and fonts */
+  .services-grid {
+    gap: 0.9rem;
+    margin-top: 1.2rem;
+  }
+
+  .service-card {
+    padding: 1rem;
+  }
+
+  .service-header {
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .service-icon {
+    font-size: 1.4rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .service-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .service-card h3::after {
+    margin-top: 0.5rem;
+    width: 40px;
+  }
+
+  .service-card p {
+    font-size: 0.8rem;
+    margin: 0.6rem 0 0.8rem;
+    line-height: 1.5;
+  }
+
+  .tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  /* Reduce section title and subtitle fonts */
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .section-sub {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Scale down portfolio items */
+  .portfolio-item {
+    width: 260px;
+  }
+
+  .portfolio-image {
+    height: 120px;
+    font-size: 1.4rem;
+  }
+
+  .portfolio-item h3 {
+    font-size: 0.8rem;
+    margin: 0.6rem 0.7rem 0.2rem;
+  }
+
+  .portfolio-desc {
+    font-size: 0.7rem;
+    margin: 0 0.7rem 0.6rem;
+    line-height: 1.4;
+  }
+
+  .carousel-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  /* Reduce contact section spacing */
+  .contact-wrapper {
+    gap: 1.2rem;
+  }
+
+  .contact-form-section {
+    padding: 1.2rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .label-text {
+    font-size: 0.8rem;
+  }
+
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form select {
+    padding: 0.65rem 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .contact-card {
+    width: 150px;
+    padding: 0.8rem;
+  }
+
+  .contact-card h3 {
+    font-size: 0.8rem;
+  }
+
+  .contact-card p {
+    font-size: 0.65rem;
+  }
+
+  .contact-icon {
+    font-size: 1.6rem;
+  }
+
+  /* Scale down footer in landscape */
+  .site-footer {
+    padding: 1.2rem 0 0.8rem;
+  }
+
+  .footer-content {
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .footer-section {
+    gap: 0.5rem;
+  }
+
+  .footer-desc {
+    font-size: 0.75rem;
+    margin: 0.3rem 0;
+  }
+
+  .footer-heading {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .footer-nav a {
+    font-size: 0.7rem;
+    padding: 0.4rem 0;
+  }
+
+  .footer-bottom {
+    padding-bottom: 30px;
+    font-size: 0.7rem;
+  }
+
+  /* Adjust fast-response badge for landscape */
+  .fast-response {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+    margin-left: 0.3rem;
+    min-width: auto;
+    white-space: nowrap;
+  }
+
+  /* Reduce theme toggle size */
+  .theme-toggle {
+    padding: 0.3rem 0.5rem;
+  }
+
+  .theme-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+  }
+
+  /* Ensure nav stays compact in landscape */
+  .nav a {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  /* Reduce section padding in landscape */
+  .section {
+    padding: 1.2rem 0;
+  }
+
+  .section.alt {
+    padding: 1.2rem 0;
+  }
+
+  /* Adjust container padding */
+  :root {
+    --container-pad: 1rem;
+  }
+
+  /* Scale down heading and subtitle in mock-body */
+  .expertise-title {
+    font-size: 0.75rem;
+  }
+
+  .expertise-desc {
+    font-size: 0.7rem;
+  }
+
+  .expertise-icon {
+    font-size: 1.1rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+  }
+
+  .mission-text {
+    font-size: 0.7rem;
+    padding: 0.5rem;
+  }
 }
 
