@@ -1604,6 +1604,34 @@ body{padding-top:70px}
     scroll-padding-inline: calc((100vw - 58vw) / 2);
   }
 }
+
+/* COMPREHENSIVE MOBILE LIGHT MODE FIX: Disable all full-bleed overlays and pseudo-elements
+   to achieve true app-like feel with NO horizontal scroll on small screens (200px-900px). */
+@media (max-width:900px){
+  [data-theme="light"] .hero::after,
+  [data-theme="light"] .hero::before,
+  [data-theme="light"] #services::after,
+  [data-theme="light"] #services::before,
+  [data-theme="light"] #portfolio::after,
+  [data-theme="light"] #portfolio::before,
+  [data-theme="light"] #contact::after,
+  [data-theme="light"] #contact::before {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Ensure sections don't try to render fixed overlays */
+  [data-theme="light"] .hero,
+  [data-theme="light"] #services,
+  [data-theme="light"] #portfolio,
+  [data-theme="light"] #contact {
+    position: relative !important;
+    overflow: visible !important;
+  }
+}
+
 .section-title{margin:0 0 .25rem;font-size:1.25rem}
 .section-sub{color:var(--muted);margin:0 0 1rem}
 

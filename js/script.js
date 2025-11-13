@@ -273,6 +273,44 @@ document.addEventListener('DOMContentLoaded', function(){
     e.preventDefault();
   }, false);
 
+  // LIGHT MODE APP FEEL: Enforce stricter no-scroll + no-zoom behavior on mobile light mode for app-like UX
+  function enforceLightModeAppFeel(){
+    const theme = html.getAttribute('data-theme');
+    const isMobile = window.innerWidth <= 900;
+    
+    if(theme === 'light' && isMobile){
+      // Disable double-tap zoom with even more aggressive prevention
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function(e){
+        const now = Date.now();
+        if(now - lastTouchEnd <= 300){
+          e.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, { passive: false });
+
+      // Prevent pinch zoom
+      document.addEventListener('touchmove', function(e){
+        if(e.touches.length > 1){
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // Lock body/html to prevent any scrolling escape
+      document.body.style.overflowX = 'hidden';
+      document.documentElement.style.overflowX = 'hidden';
+    }
+  }
+
+  // Run on init and when theme changes
+  enforceLightModeAppFeel();
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  if(themeToggleBtn){
+    themeToggleBtn.addEventListener('click', function(){
+      setTimeout(() => enforceLightModeAppFeel(), 400);
+    });
+  }
+
   // Hero section animations and interactions
   const heroCopy = document.querySelector('.hero-copy');
   const ctaButtons = document.querySelectorAll('.cta-row .btn');
