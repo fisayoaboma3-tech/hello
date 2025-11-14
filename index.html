@@ -2,18 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="ENOCHDESK: Web Development, SEO Optimization, and AI-Powered Virtual Assistant. Helping entrepreneurs scale their business with efficiency and intelligence.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0>
+  <meta name="description" content="ENOCHDESK: Web Development, SEO Optimization, and AI-Powered Virtual Assistant.
+   Helping entrepreneurs scale their business with efficiency and intelligence.">
   <meta name="google-site-verification" content="jAD850_iNDQvtyaK7W_AVE9s6ahVNjaX5F6FNNeblww">
   <title>ENOCHDESK — Web Developer, SEO Specialist & Virtual Assistant</title>
-  <!-- Immediately set dark theme to avoid a flash of light theme on first paint -->
-  <script>
-  /* set dark theme synchronously before styles load */(function(){try{document.documentElement.setAttribute('data-theme','dark')}catch(e){}})();
-  </script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1349 1349'%3E%3Crect fill='%23000' width='1349' height='1349'/%3E%3Cpath fill='%23fff' d='M280 290Q280 180 370 110Q460 40 560 40Q660 40 750 110Q840 180 840 290L840 860Q840 970 750 1040Q660 1110 560 1110Q460 1110 370 1040Q280 970 280 860V290Z'/%3E%3Cpath fill='%23000' d='M560 400L750 400L750 500L560 500V400M560 600L750 600L750 700L560 700V600'/%3E%3Cpath fill='%23fff' d='M1040 290Q1040 180 950 110Q860 40 760 40Q660 40 750 110Q840 180 840 290L840 860Q840 970 950 1040Q1040 1110 1140 1110Q1240 1110 1150 1040Q1060 970 1060 860V290Z'/%3E%3Cpath fill='%23000' d='M850 400L1040 400L1040 500L850 500V400M850 600L1040 600L1040 700L850 700V600'/%3E%3C/svg%3E">
-  <!-- Load main styles non-blocking: preload then swap to stylesheet on load. noscript fallback for users with JS disabled -->
-  <link rel="preload" href="css/styles.css" as="style" onload="this.rel='stylesheet'">
-  <link rel="preload" href="css/desktop-contact.css" as="style" onload="this.rel='stylesheet'">
+  <script>document.documentElement.dataset.theme = 'dark';</script>
+  <link rel="icon" href="images/brandlogo.jpg">
+  <link rel="preload" href="css/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="css/desktop-contact.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/desktop-contact.css">
@@ -24,26 +21,23 @@
   <header class="site-header">
     <div class="container header-inner">
 
-      <a href="#home" class="brand"  aria-label="VA home">
-        <img src="images/brandlogo.jpg" alt="ENOCHDESK" class="brand-logo" 
+      <a href="#home" class="brand">
+        <img src="images/brandlogo.jpg" class="brand-logo" 
         loading="lazy" decoding="async">
-        <span class="brand-name"><span class="brand-enoch">ENOCH</span><span class="brand-desk">DESK</span></span>
+        <span class="brand-name">
+          <span class="brand-enoch">ENOCH</span>
+          <span class="brand-desk">DESK</span>
+        </span>
       </a>
 
       <!-- Theme toggle (light / dark) -->
-      <button id="theme-toggle" class="theme-toggle" aria-pressed="false" aria-label="Toggle color theme">
-        <span class="sr-only">Toggle color theme</span>
-        <span class="theme-icon" aria-hidden="true"></span>
+      <button id="theme-toggle" class="theme-toggle">
+        <span class="theme-icon"></span>
       </button>
 
-      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation">
-        <span class="sr-only">Toggle navigation</span>
-        <!-- Three separate paths so we can animate to an X -->
-        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M4 6h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 12h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
+      <!---Hamburger menu-->
+      <button class="nav-toggle">
+        <img src="images/hamburger-menu-svgrepo-com (2).svg" width="96" height="26">
       </button>
 
       <nav id="primary-nav" class="nav">
@@ -57,66 +51,7 @@
         </ul>
       </nav>
     </div>
-
-
   </header>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   <main>
     <section id="home" class="hero">

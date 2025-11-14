@@ -320,25 +320,40 @@ document.addEventListener('DOMContentLoaded', function(){
   // If you want JS-driven micro-interactions later, prefer toggling a class and scheduling via rAF.
 
   // Smooth scroll to section functionality
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+  // Get all links that have # in them
+  const allLinks = document.querySelectorAll('a[href^="#"]');
+  
+  // Go through each link
+  for (let i = 0; i < allLinks.length; i++) {
+    const link = allLinks[i];
+    
+    // When someone clicks this link
+    link.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
+      
+      // Check if the link is valid
       if(href !== '#' && document.querySelector(href)) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        // compute header height and optional extra padding on mobile
-        const header = document.querySelector('.site-header');
-        const headerHeight = header ? header.offsetHeight : 70;
-        const extraPadding = window.innerWidth <= 720 ? 20 : 0; // mobile: add 20px top padding
+        e.preventDefault(); // Stop the instant jump
+        
+        const target = document.querySelector(href); // Find the section to scroll to
+        const header = document.querySelector('.site-header'); // Get header
+        const headerHeight = header ? header.offsetHeight : 70; // Get header size
+        const extraPadding = window.innerWidth <= 720 ? 20 : 0; // Extra space on mobile
+        
+        // Calculate where to scroll
         const rect = target.getBoundingClientRect();
         const top = window.scrollY + rect.top - headerHeight - extraPadding;
+        
+        // Smoothly scroll to that position
         window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 
-        // if mobile nav is open, close it and reset toggle state
+        // Close mobile menu if it's open
         const nav = document.getElementById('primary-nav');
         const navToggle = document.querySelector('.nav-toggle');
+        
         if(nav && nav.classList.contains('open')){
-          nav.classList.remove('open');
+          nav.classList.remove('open'); // Hide the menu
+          
           if(navToggle){
             navToggle.setAttribute('aria-expanded','false');
             navToggle.classList.remove('active');
@@ -347,18 +362,34 @@ document.addEventListener('DOMContentLoaded', function(){
         }
       }
     });
-  });
+  }
 
-  // Mobile nav toggle with hamburger to X animation
+  // Mobile nav toggle with hamburger to cancel icon swap
   const navToggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('primary-nav');
   if(navToggle && nav){
+    const hamburgerImg = navToggle.querySelector('img');
+    
     navToggle.addEventListener('click', function(){
       const expanded = this.getAttribute('aria-expanded') === 'true';
       const newState = !expanded;
       this.setAttribute('aria-expanded', String(newState));
       nav.classList.toggle('open');
       navToggle.classList.toggle('active');
+      
+      // Swap icon: hamburger ↔ cancel
+      if(hamburgerImg){
+        if(newState){
+          // Menu is open, show cancel icon
+          hamburgerImg.src = 'images/cancel-svgrepo-com.svg';
+          hamburgerImg.alt = 'Close menu';
+        } else {
+          // Menu is closed, show hamburger icon
+          hamburgerImg.src = 'images/hamburger-menu-svgrepo-com (2).svg';
+          hamburgerImg.alt = 'Menu';
+        }
+      }
+      
       // update accessible label
       this.setAttribute('aria-label', newState ? 'Close navigation' : 'Open navigation');
     });
